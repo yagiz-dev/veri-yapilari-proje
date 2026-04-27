@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BinTree
 {
-    class DataStructures
+    internal class DataStructures
     {
         public class Node<T>
         {
@@ -168,21 +168,13 @@ namespace BinTree
         public class TreeNode<T>
         {
             private T _data;
-            private int _height = 0;
             public TreeNode<T> Left { get; set; }
             public TreeNode<T> Right { get; set; }
-
             public TreeNode(T data)
             {
                 this.Data = data;
                 Left = null;
                 Right = null;
-            }
-
-            public int Height
-            {
-                get { return _height; }
-                set { _height = value; }
             }
 
 
@@ -196,7 +188,7 @@ namespace BinTree
         public class BinarySearchTree<T> where T : IComparable<T>
         //Ağacınız int, string, double veya DateTime gibi C#'ın yerleşik yapılarıyla kusursuz çalışır, çünkü bu yapıların hepsi Microsoft tarafından IComparable olarak tasarlanmıştır.
         {
-            TreeNode<T> Root = null;
+            TreeNode<T> Root;
 
             public bool IsEmpty()
             {
@@ -209,135 +201,49 @@ namespace BinTree
                 return node.Left == null && node.Right == null;
             }
 
-            private int GetHeight(TreeNode<T> node)
-            {
-                return node == null ? 0 : node.Height;
-            }
-
-            private int GetBalanceFactor(TreeNode<T> node)
-            {
-                if (node == null) return 0;
-                return GetHeight(node.Left) - GetHeight(node.Right);
-            }
-
             public void Insert(T data)
             {
                 if (IsEmpty())
-                {                    
+                {
                     Root = new TreeNode<T>(data);
                 }
                 else
                 {
-                    Root = InsertRecursively(Root, data);
+                    InsertRecursively(Root, data);
                 }
-            }
- 
-            private void CheckBalance(TreeNode<T> node)
-            {
-                if (node == null) return;            
-                if (GetBalanceFactor(node) > 1)
-                {
-                    if (GetHeight(node.Left) > GetHeight(node.Right))
-                    {
-                        if(GetHeight(node.Left.Left) >= GetHeight(node.Left.Right))
-                        {
-                            // Sağ Rotasyon
-                            node = RotateRight(node);
-                        }
-                        else
-                        {
-                            // Sol-Sağ Rotasyon
-                            node.Left = RotateLeft(node.Left);
-                            node = RotateRight(node);
-                        }
-                    }
-                    else
-                    {
-                        if(GetHeight(node.Right.Right) >= GetHeight(node.Right.Left))
-                        {
-                            // Sol Rotasyon
-                            node = RotateLeft(node);
-                        }
-                        else
-                        {
-                            // Sağ-Sol Rotasyon
-                            node.Right = RotateRight(node.Right);
-                            node = RotateLeft(node);
-                        }
-                    }
-                }
-                return;
-            }
-            
-            private TreeNode<T> RotateRight(TreeNode<T> node)
-            {
-                TreeNode<T> newRoot = node.Left;
-                node.Left = newRoot.Right;
-                newRoot.Right = node;
-                node.Height = Math.Max(GetHeight(node.Left), GetHeight(node.Right)) + 1;
-                newRoot.Height = Math.Max(GetHeight(newRoot.Left), GetHeight(newRoot.Right)) + 1;                
-                return newRoot;
             }
 
-            private TreeNode<T> RotateLeft(TreeNode<T> node)
+            private void InsertRecursively(TreeNode<T> node, T data)
             {
-                TreeNode<T> newRoot = node.Right;
-                node.Right = newRoot.Left;
-                newRoot.Left = node;
-                node.Height = Math.Max(GetHeight(node.Left), GetHeight(node.Right)) + 1;
-                newRoot.Height = Math.Max(GetHeight(newRoot.Left), GetHeight(newRoot.Right)) + 1;
-                return newRoot;
-            }
-
-            private TreeNode<T> InsertRecursively(TreeNode<T> node, T data)
-            {
-                if (node == null) 
-                {
-                    TreeNode<T> newNode = new TreeNode<T>(data);
-                    newNode.Height = 1; 
-                    return newNode;
-                }
+                if (IsEmpty()) return;
+                if (node == null || data == null) throw new ArgumentNullException("Error: Node or data is null.");
 
                 if (data.CompareTo(node.Data) < 0)
                 {
-                    node.Left = InsertRecursively(node.Left, data);
+                    if (node.Left == null)
+                    {
+                        node.Left = new TreeNode<T>(data);
+                    }
+                    else
+                    {
+                        InsertRecursively(node.Left, data);
+                    }
                 }
                 else if (data.CompareTo(node.Data) > 0)
                 {
-                    node.Right = InsertRecursively(node.Right, data);
-                }
-                else
-                {
-                    return node;
-                }
-
-                node.Height = Math.Max(GetHeight(node.Left), GetHeight(node.Right)) + 1;
-
-                int balance = GetBalanceFactor(node);
-
-                if (balance > 1) 
-                {
-                    if (data.CompareTo(node.Left.Data) < 0) 
-                        return RotateRight(node); 
-                    
-                    if (data.CompareTo(node.Left.Data) > 0) 
+                    if (node.Right == null)
                     {
-                        node.Left = RotateLeft(node.Left);
-                        return RotateRight(node);
+                        node.Right = new TreeNode<T>(data);
+                    }
+                    else
+                    {
+                        InsertRecursively(node.Right, data);
                     }
                 }
-                if (balance < -1)
+                else if (data.CompareTo(node.Data) == 0)
                 {
-                    if (data.CompareTo(node.Right.Data) > 0)
-                        return RotateLeft(node);
-
-                    if (data.CompareTo(node.Right.Data) < 0)
-                    {
-                        node.Right = RotateRight(node.Right);
-                        return RotateLeft(node);
-                    }
+                    // Duplicate value, do nothing or handle as needed
                 }
-                return node; 
             }
 
             public bool Search(T data)
@@ -347,11 +253,10 @@ namespace BinTree
 
             private bool SearchRecursively(TreeNode<T> node, T data)
             {
-                if (node == null || data == null) { Console.WriteLine("Error: \"" + data + "\" not found."); throw new ArgumentNullException("Error: Node or data is null."); }
-
+                if (node == null) return false;
+                if (data == null) throw new ArgumentNullException("Error: Data is null.");
                 if (data.CompareTo(node.Data) == 0)
                 {
-                    Console.WriteLine("Data found! Height: {0}", node.Height);
                     return true;
                 }
                 else if (data.CompareTo(node.Data) < 0)
@@ -364,7 +269,7 @@ namespace BinTree
                 }
             }
 
-            public void Remove(T data)//silinecek düğümün sol çocuuğunun en sağ çocuğunu veya sağ çocuğunun en sol çocuğu ile değiştirilmesi işlemi yapılır
+            public void Remove(T data)
             {
                 if (Root == null) throw new InvalidOperationException("Tree is empty.");
                 if (data == null) throw new ArgumentNullException(nameof(data));
@@ -418,7 +323,7 @@ namespace BinTree
                     parent.Right = child;
                 }
             }
-           
+
             public void PreOrder()
             {
                 // ==========================================
@@ -435,7 +340,6 @@ namespace BinTree
                 if (node != null)
                 {
                     Console.Write(node.Data + " "); // Önce Kök
-                    Console.WriteLine("Level: " + node.Height); // Düğümün seviyesini yazdır
                     PreOrderRecursive(node.Left);   // Sonra Sol
                     PreOrderRecursive(node.Right);  // En Son Sağ
                 }
@@ -458,7 +362,6 @@ namespace BinTree
                 {
                     InOrderRecursive(node.Left);    // Önce Sol
                     Console.Write(node.Data + " "); // Sonra Kök
-                    Console.WriteLine("Level: " + node.Height); // Düğümün seviyesini yazdır
                     InOrderRecursive(node.Right);   // En Son Sağ
                 }
             }
@@ -481,7 +384,6 @@ namespace BinTree
                     PostOrderRecursive(node.Left);  // Önce Sol
                     PostOrderRecursive(node.Right); // Sonra Sağ
                     Console.Write(node.Data + " "); // En Son Kök
-                    Console.WriteLine("Level: " + node.Height); // Düğümün seviyesini yazdır
                 }
             }
 
