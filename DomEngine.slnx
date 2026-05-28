@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="DomEngine.Api/DomEngine.Api.csproj" />
+  <Project Path="DomEngine.Core/DomEngine.Core.csproj" />
+</Solution>
