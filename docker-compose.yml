@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: DomEngine.Api/Dockerfile
+    container_name: domengine_api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+    expose:
+      - "8080"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./DomEngine.Web
+      dockerfile: Dockerfile
+    container_name: domengine_web
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped

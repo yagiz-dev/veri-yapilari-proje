@@ -1,45 +1,29 @@
 # Veri Yapıları ile HTML'den DOM Ağacı Oluşturma Projesi
 
-Bu proje, bir HTML stringini parse ederek DOM ağacı yapısı oluşturur. Mevcut aşamada projenin backend'inin temeli atılmış olup ileride bir frontend kısmı ile desteklenecektir.
+Bu proje, bir HTML stringini parse ederek DOM ağacı yapısı oluşturur.
 
-Proje .NET 10 framework ile yazılmıştır. İleride Docker ile çalışan bir sistem kuracağız, ilk aşamada test etmek için .NET 10 kurmanız gerekiyor.
+Backend ve API kısmı .NET 8 framework ile yazılmıştır. 
+AJAX kullanarak backendle iletişime geçen bir frontend oluşturulmuştur.
 
-## Eklenecek özellikler
-- Mevcuttaki C# backend HTTP API yapısına dönüştürülecek
-- Arama algoritmaları yazılacak
-- Basit bir frontend ile string alınıp parse edilip API'a gönderilerek DOM ağacı oluşturulacak
+Tüm temel veri yapıları ve arama algoritmaları C#'taki hazır koleksiyonlar (`List<>`, `Dictionary<>` vb.) kullanılmadan sıfırdan yazılmıştır.
+
+## Yapılacaklar
 - Hatalı HTML stringleri tespit edilebilecek
-- Docker Compose ile container yapısı kurulacak
+- Arama kriterleri daha spesifik olacak
+- Benchmark için işlem süresi gösterilecek
 - UML diyagramları, zaman karmaşıklıkları ve Big-O notasyonu hesaplanacak
 - Sunumlar ve demo videoları hazırlanacak
 
-## Şu anki kapsam
-- Main'e hardcode edilen HTML stringini basit bir şekilde parse etme
-- HTML tag'leri basit bir şekilde parse edilir, attribute'lar veya ID'ler henüz parse edilmez
-- Konsola çıktı olarak verme (HTTP API ile değiştirilecek)
-
 ## Çalıştırma
-Projeyi çalıştırmak için Main fonksiyonundaki html değişkenini değiştirip şu komutu kullanabilirsiniz:
+Projeyi hızlı bir şekilde çalıştırmak için Docker kullanabilirsiniz.
+
+Projenin ana klasöründe bir Docker Compose dosyası bulunmaktadır. Aşağıdaki komutla hem frontend hem de backend projelerini aynı anda çalıştırabilirsiniz.
 
 ```bash
-dotnet run --project DomTreePoc
+  docker compose up -d --build
 ```
-Örnek çıktı:
 
-```text
-DOM agaci:
-
-#document
-  html
-    body
-      main
-        section
-          h1
-          p
-        section
-          article
-          article
-```
+Proje derlendikten sonra [localhost:3000](http://localhost:3000) üzerinden arayüze ulaşabilirsiniz.
 
 ## Lisans
 Proje MIT lisansı altında lisanslanmıştır.
