@@ -7,6 +7,7 @@ const API_BASE = window.location.protocol === 'file:' || window.location.port ==
 
 // Initialize Ace Editor
 const editor = ace.edit("htmlEditor");
+const Range = ace.require("ace/range").Range;
 editor.setTheme("ace/theme/tomorrow_night_eighties");
 editor.session.setMode("ace/mode/html");
 editor.setOptions({
@@ -27,12 +28,15 @@ const statusBadge = document.getElementById('statusBadge');
 
 // State
 let lastRenderedDom = null;
+let parserErrorMarker = null;
+let parserErrorRow = null;
 
 // Event Listeners
 parseBtn.addEventListener('click', async () => {
     const htmlContent = editor.getValue();
     
     if (!htmlContent.trim()) {
+        clearParserErrorHighlight();
         showStatus('HTML içeriği boş!', 'error');
         return;
     }
@@ -45,16 +49,21 @@ parseBtn.addEventListener('click', async () => {
             body: JSON.stringify({ htmlContent })
         });
 
-        if (!response.ok) throw new Error('API Hatası');
+        if (!response.ok) {
+            throwApiError(await getApiErrorMessage(response, 'API Hatası'));
+        }
 
         const treeData = await response.json();
         lastRenderedDom = treeData;
+        clearParserErrorHighlight();
         renderTree(treeData);
         showStatus('Ağaç Oluşturuldu', 'success');
     } catch (error) {
         console.error(error);
-        showStatus('Sunucuya Bağlanılamadı', 'error');
-        treeContainer.innerHTML = `<div class="empty-state"><p style="color: #ef4444;">API'ye bağlanılamadı. C# projesinin çalıştığından emin olun.</p></div>`;
+        const message = error.isApiError ? error.message : 'Sunucuya Bağlanılamadı';
+        showStatus(error.isApiError ? 'HTML Hatası' : message, 'error');
+        renderParserError(message);
+        highlightParserErrorLine(message);
     } finally {
         setLoading(false);
     }
@@ -75,7 +84,9 @@ searchBtn.addEventListener('click', async () => {
             body: JSON.stringify({ htmlContent, query, searchType: type })
         });
 
-        if (!response.ok) throw new Error('Arama Hatası');
+        if (!response.ok) {
+            throwApiError(await getApiErrorMessage(response, 'Arama Hatası'));
+        }
 
         const results = await response.json();
         highlightResults(results);
@@ -87,7 +98,13 @@ searchBtn.addEventListener('click', async () => {
         }
     } catch (error) {
         console.error(error);
-        showStatus('Arama Başarısız', 'error');
+        if (error.isApiError) {
+            showStatus('HTML Hatası', 'error');
+            renderParserError(error.message);
+            highlightParserErrorLine(error.message);
+        } else {
+            showStatus('Arama Başarısız', 'error');
+        }
     } finally {
         setLoading(false);
     }
@@ -114,6 +131,71 @@ function showStatus(text, type) {
         statusBadge.style.background = 'rgba(16, 185, 129, 0.2)';
         statusBadge.style.borderColor = 'rgba(16, 185, 129, 0.3)';
     }
+}
+
+async function getApiErrorMessage(response, fallback) {
+    const contentType = response.headers.get('content-type') || '';
+
+    if (contentType.includes('application/json')) {
+        const body = await response.json();
+        return body.message || body.title || body.detail || fallback;
+    }
+
+    const message = await response.text();
+    return message || fallback;
+}
+
+function throwApiError(message) {
+    const error = new Error(message);
+    error.isApiError = true;
+    throw error;
+}
+
+function renderParserError(message) {
+    treeContainer.innerHTML = '';
+
+    const emptyState = document.createElement('div');
+    emptyState.className = 'empty-state';
+
+    const errorText = document.createElement('p');
+    errorText.style.color = '#ef4444';
+    errorText.textContent = message;
+
+    emptyState.appendChild(errorText);
+    treeContainer.appendChild(emptyState);
+}
+
+function highlightParserErrorLine(message) {
+    clearParserErrorHighlight();
+
+    const match = message.match(/Satır:\s*(\d+)/);
+    if (!match) return;
+
+    const lineNumber = Number(match[1]);
+    if (!Number.isInteger(lineNumber) || lineNumber < 1) return;
+
+    const row = lineNumber - 1;
+    const lineLength = editor.session.getLine(row).length;
+    parserErrorMarker = editor.session.addMarker(new Range(row, 0, row, Math.max(lineLength, 1)), 'parser-error-line', 'fullLine', false);
+    parserErrorRow = row;
+    editor.session.addGutterDecoration(row, 'parser-error-gutter');
+    editor.session.setAnnotations([{ row, column: 0, text: message, type: 'error' }]);
+    editor.gotoLine(lineNumber, 0, true);
+    editor.focus();
+}
+
+function clearParserErrorHighlight() {
+    if (parserErrorMarker !== null) {
+        editor.session.removeMarker(parserErrorMarker);
+        parserErrorMarker = null;
+    }
+
+    if (parserErrorRow !== null) {
+        editor.session.removeGutterDecoration(parserErrorRow, 'parser-error-gutter');
+        parserErrorRow = null;
+    }
+
+    editor.session.clearAnnotations();
 }
 
 // Tree Rendering Logic
