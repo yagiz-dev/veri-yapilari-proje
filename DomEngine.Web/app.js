@@ -1,0 +1,254 @@
+// API Base URL
+// Docker ile çalışırken Nginx reverse proxy (/api) kullanılacak. 
+// Dosyaya çift tıklanarak (file://) açıldıysa veya farklı bir geliştirme ortamıysa yerel API adresine (localhost:5265) gidecek.
+const API_BASE = window.location.protocol === 'file:' || window.location.port === '5500' 
+    ? 'http://localhost:5265/api/parser' 
+    : '/api/parser';
+
+// Initialize Ace Editor
+const editor = ace.edit("htmlEditor");
+editor.setTheme("ace/theme/tomorrow_night_eighties");
+editor.session.setMode("ace/mode/html");
+editor.setOptions({
+    fontSize: "14px",
+    showPrintMargin: false,
+    wrap: true,
+    scrollPastEnd: 0.5
+});
+editor.session.setUseWorker(false); // Disable syntax validation worker
+
+// DOM Elements
+const parseBtn = document.getElementById('parseBtn');
+const searchBtn = document.getElementById('searchBtn');
+const searchInput = document.getElementById('searchInput');
+const searchType = document.getElementById('searchType');
+const treeContainer = document.getElementById('treeContainer');
+const statusBadge = document.getElementById('statusBadge');
+
+// State
+let lastRenderedDom = null;
+
+// Event Listeners
+parseBtn.addEventListener('click', async () => {
+    const htmlContent = editor.getValue();
+    
+    if (!htmlContent.trim()) {
+        showStatus('HTML içeriği boş!', 'error');
+        return;
+    }
+
+    try {
+        setLoading(true);
+        const response = await fetch(`${API_BASE}/parse`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ htmlContent })
+        });
+
+        if (!response.ok) throw new Error('API Hatası');
+
+        const treeData = await response.json();
+        lastRenderedDom = treeData;
+        renderTree(treeData);
+        showStatus('Ağaç Oluşturuldu', 'success');
+    } catch (error) {
+        console.error(error);
+        showStatus('Sunucuya Bağlanılamadı', 'error');
+        treeContainer.innerHTML = `<div class="empty-state"><p style="color: #ef4444;">API'ye bağlanılamadı. C# projesinin çalıştığından emin olun.</p></div>`;
+    } finally {
+        setLoading(false);
+    }
+});
+
+searchBtn.addEventListener('click', async () => {
+    const query = searchInput.value.trim();
+    if (!query) return;
+
+    const type = searchType.value;
+    const htmlContent = editor.getValue();
+
+    try {
+        setLoading(true);
+        const response = await fetch(`${API_BASE}/search`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ htmlContent, query, searchType: type })
+        });
+
+        if (!response.ok) throw new Error('Arama Hatası');
+
+        const results = await response.json();
+        highlightResults(results);
+        
+        if(results.length > 0) {
+            showStatus(`${results.length} sonuç bulundu (${type})`, 'success');
+        } else {
+            showStatus('Sonuç bulunamadı', 'error');
+        }
+    } catch (error) {
+        console.error(error);
+        showStatus('Arama Başarısız', 'error');
+    } finally {
+        setLoading(false);
+    }
+});
+
+function setLoading(isLoading) {
+    parseBtn.disabled = isLoading;
+    searchBtn.disabled = isLoading;
+    if (isLoading) {
+        parseBtn.innerHTML = 'İşleniyor...';
+    } else {
+        parseBtn.innerHTML = 'Ağacı Oluştur';
+    }
+}
+
+function showStatus(text, type) {
+    statusBadge.textContent = text;
+    if (type === 'error') {
+        statusBadge.style.color = '#ef4444';
+        statusBadge.style.background = 'rgba(239, 68, 68, 0.2)';
+        statusBadge.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+    } else {
+        statusBadge.style.color = '#10b981';
+        statusBadge.style.background = 'rgba(16, 185, 129, 0.2)';
+        statusBadge.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+    }
+}
+
+// Tree Rendering Logic
+function renderTree(nodeData) {
+    treeContainer.innerHTML = '';
+    const rootEl = createTreeNode(nodeData);
+    treeContainer.appendChild(rootEl);
+}
+
+const selfClosingTags = ['img', 'br', 'hr', 'input', 'meta', 'link'];
+
+function createTreeNode(node) {
+    const container = document.createElement('div');
+    container.className = 'tree-node';
+    
+    // Benzersiz ID imzasını oluştur (Arama vurgusu için)
+    const nodeSignature = btoa(encodeURIComponent(node.tagName + (node.id || '') + (node.className || '')));
+    container.setAttribute('data-sig', nodeSignature);
+
+    const item = document.createElement('div');
+    item.className = 'tree-item';
+    
+    // Durumları kontrol et
+    const hasChildren = node.children && node.children.length > 0;
+    const hasText = node.innerText && node.innerText.trim().length > 0;
+    const isSelfClosing = selfClosingTags.includes(node.tagName.toLowerCase());
+    
+    // İçinde metin veya çocuk varsa açılır kapanır (collapsible) olsun
+    const isCollapsible = hasChildren || hasText;
+    
+    if (isCollapsible) {
+        const caret = document.createElement('span');
+        caret.className = 'caret open';
+        item.appendChild(caret);
+        
+        // Sadece ok ikonuna değil, tüm satıra tıklandığında açılıp kapanmasını sağlıyoruz
+        item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            caret.classList.toggle('open');
+            const innerContainer = container.querySelector(':scope > .children-container');
+            if (innerContainer) innerContainer.classList.toggle('open');
+        });
+    } else {
+        // İkona denk gelen hizalama boşluğu
+        const spacer = document.createElement('span');
+        spacer.style.width = '11px';
+        spacer.style.display = 'inline-block';
+        item.appendChild(spacer);
+    }
+
+    // Açılış Etiketi ve Nitelikler (Attributes)
+    const tagContent = document.createElement('span');
+    let attrsHtml = '';
+    if (node.attributes) {
+        for (const [key, value] of Object.entries(node.attributes)) {
+            attrsHtml += `<span class="attr-key">${key}</span>=<span class="attr-value">"${value}"</span>`;
+        }
+    }
+
+    const closeChar = isSelfClosing ? ' /&gt;' : '&gt;';
+    tagContent.innerHTML = `<span class="tag-bracket">&lt;</span><span class="tag-name">${node.tagName}</span>${attrsHtml}<span class="tag-bracket">${closeChar}</span>`;
+    item.appendChild(tagContent);
+    container.appendChild(item);
+
+    // Eğer içi doluysa (Metin veya Çocuk)
+    if (isCollapsible) {
+        const innerContainer = document.createElement('div');
+        innerContainer.className = 'children-container open';
+        
+        // Önce metni (Inner Text) ekle
+        if (hasText) {
+            const textNode = document.createElement('div');
+            textNode.className = 'node-text';
+            textNode.textContent = node.innerText.trim();
+            innerContainer.appendChild(textNode);
+        }
+        
+        // Sonra alt çocukları (Children) ekle
+        if (hasChildren) {
+            node.children.forEach(child => {
+                innerContainer.appendChild(createTreeNode(child));
+            });
+        }
+        // Eğer içi doluysa kapanış etiketini de içine koyalım ki kapanınca o da gizlensin
+        if (!isSelfClosing) {
+            const closingItem = document.createElement('div');
+            closingItem.className = 'tree-item';
+            closingItem.style.marginLeft = '11px'; // Girinti hizalaması
+            closingItem.innerHTML = `<span class="tag-bracket">&lt;/</span><span class="tag-name">${node.tagName}</span><span class="tag-bracket">&gt;</span>`;
+            innerContainer.appendChild(closingItem);
+        }
+        
+        container.appendChild(innerContainer);
+    } else {
+        // İçi boş ama kapanması gereken etiketler (örn: <div></div>)
+        if (!isSelfClosing) {
+            const closingItem = document.createElement('div');
+            closingItem.className = 'tree-item';
+            closingItem.style.marginLeft = '11px'; // Girinti hizalaması
+            closingItem.innerHTML = `<span class="tag-bracket">&lt;/</span><span class="tag-name">${node.tagName}</span><span class="tag-bracket">&gt;</span>`;
+            container.appendChild(closingItem);
+        }
+    }
+
+    return container;
+}
+
+function highlightResults(results) {
+    // Remove old highlights
+    document.querySelectorAll('.tree-item.highlighted').forEach(el => el.classList.remove('highlighted'));
+    
+    if (!results || results.length === 0) return;
+
+    // We need to match the returned nodes with the DOM nodes. 
+    // Since we created signatures based on tag+id+class, we'll try to find them.
+    results.forEach(res => {
+        const sig = btoa(encodeURIComponent(res.tagName + (res.id || '') + (res.className || '')));
+        const matchedNodes = document.querySelectorAll(`[data-sig="${sig}"] > .tree-item`);
+        
+        matchedNodes.forEach(item => {
+            item.classList.add('highlighted');
+            // Expand all parents
+            let parent = item.parentElement;
+            while (parent && parent.id !== 'treeContainer') {
+                if (parent.classList.contains('children-container')) {
+                    parent.classList.add('open');
+                    const prevSibling = parent.previousElementSibling; // text or item
+                    // if item has caret
+                    const caret = parent.parentElement.querySelector('.caret');
+                    if (caret) caret.classList.add('open');
+                }
+                parent = parent.parentElement;
+            }
+            // Scroll to view
+            item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+    });
+}
