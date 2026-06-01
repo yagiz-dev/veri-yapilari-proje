@@ -8,7 +8,7 @@ const API_BASE = window.location.protocol === 'file:' || window.location.port ==
 // Initialize Ace Editor
 const editor = ace.edit("htmlEditor");
 const Range = ace.require("ace/range").Range;
-editor.setTheme("ace/theme/tomorrow_night_eighties");
+editor.setTheme("ace/theme/chrome");
 editor.session.setMode("ace/mode/html");
 editor.setOptions({
     fontSize: "14px",
@@ -36,17 +36,17 @@ let parserErrorRow = null;
 const searchGuides = {
     id: {
         placeholder: 'Örn: header-section',
-        help: 'ID araması için sadece id değerini yazın. Örn: header-section',
+        help: 'ID değeri ile direkt arama yapın.',
         examples: ['header-section', 'content', 'deep-node', 'footer']
     },
     bfs: {
         placeholder: 'Örn: tag="div", class="card", id="deep-node"',
-        help: 'BFS araması key="value" veya key=value formatı kullanır ve DOM ağacını seviye seviye gezer.',
+        help: 'DOM ağacını seviye seviye gezer.',
         examples: ['tag="div"', 'class="card"', 'id="deep-node"', 'class="item"']
     },
     dfs: {
         placeholder: 'Örn: tag="div", class="card", id="deep-node"',
-        help: 'DFS araması key="value" veya key=value formatı kullanır ve DOM ağacında bir dalı sonuna kadar takip eder.',
+        help: 'DOM ağacında bir dalı sonuna kadar takip eder.',
         examples: ['tag="div"', 'class="card"', 'id="deep-node"', 'href="#home"']
     }
 };
@@ -204,13 +204,13 @@ function setLoading(isLoading) {
 function showStatus(text, type) {
     statusBadge.textContent = text;
     if (type === 'error') {
-        statusBadge.style.color = '#ef4444';
-        statusBadge.style.background = 'rgba(239, 68, 68, 0.2)';
-        statusBadge.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+        statusBadge.style.color = '#b91c1c';
+        statusBadge.style.background = '#fee2e2';
+        statusBadge.style.borderColor = '#fecaca';
     } else {
-        statusBadge.style.color = '#10b981';
-        statusBadge.style.background = 'rgba(16, 185, 129, 0.2)';
-        statusBadge.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+        statusBadge.style.color = '#15803d';
+        statusBadge.style.background = '#dcfce7';
+        statusBadge.style.borderColor = '#bbf7d0';
     }
 }
 
