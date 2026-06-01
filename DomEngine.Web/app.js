@@ -28,6 +28,15 @@ const statusBadge = document.getElementById('statusBadge');
 // State
 let lastRenderedDom = null;
 
+// Dropdown değiştiğinde placeholder'ı güncelle
+searchType.addEventListener('change', () => {
+    if (searchType.value === 'id') {
+        searchInput.placeholder = 'Örn: header, content, footer...';
+    } else {
+        searchInput.placeholder = 'Örn: class="container" veya tag="div"';
+    }
+});
+
 // Event Listeners
 parseBtn.addEventListener('click', async () => {
     const htmlContent = editor.getValue();
@@ -47,9 +56,10 @@ parseBtn.addEventListener('click', async () => {
 
         if (!response.ok) throw new Error('API Hatası');
 
-        const treeData = await response.json();
-        lastRenderedDom = treeData;
-        renderTree(treeData);
+        const data = await response.json();
+        lastRenderedDom = data.tree;
+        renderTree(data.tree);
+        showStats(data.totalNodes, data.treeDepth, data.elapsedMs);
         showStatus('Ağaç Oluşturuldu', 'success');
     } catch (error) {
         console.error(error);
@@ -77,11 +87,11 @@ searchBtn.addEventListener('click', async () => {
 
         if (!response.ok) throw new Error('Arama Hatası');
 
-        const results = await response.json();
-        highlightResults(results);
+        const data = await response.json();
+        highlightResults(data.results);
         
-        if(results.length > 0) {
-            showStatus(`${results.length} sonuç bulundu (${type})`, 'success');
+        if(data.count > 0) {
+            showStatus(`${data.count} sonuç bulundu (${type.toUpperCase()}) — ${data.elapsedMs.toFixed(2)} ms`, 'success');
         } else {
             showStatus('Sonuç bulunamadı', 'error');
         }
@@ -113,6 +123,26 @@ function showStatus(text, type) {
         statusBadge.style.color = '#10b981';
         statusBadge.style.background = 'rgba(16, 185, 129, 0.2)';
         statusBadge.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+    }
+}
+
+function showStats(totalNodes, treeDepth, elapsedMs) {
+    const statsContainer = document.getElementById('statsContainer');
+    if (statsContainer) {
+        statsContainer.innerHTML = `
+            <div class="stat-item">
+                <span class="stat-label">Düğüm Sayısı</span>
+                <span class="stat-value">${totalNodes}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Ağaç Derinliği</span>
+                <span class="stat-value">${treeDepth}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Parse Süresi</span>
+                <span class="stat-value">${elapsedMs.toFixed(2)} ms</span>
+            </div>
+        `;
     }
 }
 

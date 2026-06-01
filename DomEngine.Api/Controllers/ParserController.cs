@@ -4,6 +4,7 @@ using DomEngine.Core.Topology;
 using DomEngine.Core.Algorithms;
 using DomEngine.Core.DataStructures;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace DomEngine.Api.Controllers;
 
@@ -21,8 +22,8 @@ public class ParserController : ControllerBase
     public class SearchRequest
     {
         public string HtmlContent { get; set; } = string.Empty;
-        public string Query { get; set; } = string.Empty; // id="main" veya class="container" veya tag="div" gibi
-        public string SearchType { get; set; } = "id"; // id, class, tag
+        public string Query { get; set; } = string.Empty;     // ID için: "header" | DFS/BFS için: class="container"
+        public string SearchType { get; set; } = "id";        // "id", "dfs" veya "bfs"
     }
 
     [HttpPost("parse")]
@@ -33,12 +34,24 @@ public class ParserController : ControllerBase
             return BadRequest("HTML içeriği boş olamaz.");
         }
 
+        // Stopwatch ile süre ölçümü
+        var watch = Stopwatch.StartNew();
+
         var parser = new HtmlParser();
         var tree = parser.Parse(request.HtmlContent);
 
+        watch.Stop();
+
         // Kendi yazdığımız yapıları JSON olarak sorunsuz gönderebilmek için DTO'ya çeviriyoruz
         var dto = MapToDto(tree.Root);
-        return Ok(dto);
+
+        return Ok(new
+        {
+            tree = dto,
+            totalNodes = DomSearch.CountNodes(tree.Root),
+            treeDepth = DomSearch.CalculateDepth(tree.Root),
+            elapsedMs = watch.Elapsed.TotalMilliseconds
+        });
     }
 
     [HttpPost("search")]
@@ -52,23 +65,42 @@ public class ParserController : ControllerBase
         var parser = new HtmlParser();
         var tree = parser.Parse(request.HtmlContent);
 
+        // Stopwatch ile süre ölçümü
+        var watch = Stopwatch.StartNew();
+
         CustomList<DomNode> searchResults = new CustomList<DomNode>();
 
         if (request.SearchType == "id")
         {
-            // O(1) arama
+            // Hash Table ile O(1) arama — kullanıcı sadece ID değerini yazar (örn: "header")
             var node = tree.GetElementById(request.Query);
             if (node != null)
                 searchResults.Add(node);
         }
-        else if (request.SearchType == "dfs")
+        else
         {
-            searchResults = DomSearch.SearchDFS(tree, request.Query);
+            // DFS veya BFS ile O(N) arama — kullanıcı key="value" formatında yazar
+            // Örn: class="container" → searchKey = "class", searchValue = "container"
+            var parts = request.Query.Split('=', 2); // En fazla 2 parçaya böl
+            if (parts.Length != 2)
+            {
+                return BadRequest("Sorgu formatı hatalı. Örn: class=\"container\" veya tag=\"div\"");
+            }
+
+            string searchKey = parts[0].Trim().ToLower();
+            string searchValue = parts[1].Trim().Trim('"').Trim('\''); // Tırnakları temizle
+
+            if (request.SearchType == "dfs")
+            {
+                searchResults = DomSearch.SearchDFS(tree, searchKey, searchValue);
+            }
+            else // bfs
+            {
+                searchResults = DomSearch.SearchBFS(tree, searchKey, searchValue);
+            }
         }
-        else if (request.SearchType == "bfs")
-        {
-            searchResults = DomSearch.SearchBFS(tree, request.Query);
-        }
+
+        watch.Stop();
 
         var dtos = new List<object>();
         foreach (var node in searchResults)
@@ -76,7 +108,12 @@ public class ParserController : ControllerBase
             dtos.Add(MapToDto(node));
         }
 
-        return Ok(dtos);
+        return Ok(new
+        {
+            results = dtos,
+            count = dtos.Count,
+            elapsedMs = watch.Elapsed.TotalMilliseconds
+        });
     }
 
     // CustomTree -> JSON dostu DTO çevirici
@@ -109,3 +146,4 @@ public class ParserController : ControllerBase
         };
     }
 }
+
