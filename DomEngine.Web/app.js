@@ -7,7 +7,8 @@ const API_BASE = window.location.protocol === 'file:' || window.location.port ==
 
 // Initialize Ace Editor
 const editor = ace.edit("htmlEditor");
-editor.setTheme("ace/theme/tomorrow_night_eighties");
+const Range = ace.require("ace/range").Range;
+editor.setTheme("ace/theme/chrome");
 editor.session.setMode("ace/mode/html");
 editor.setOptions({
     fontSize: "14px",
@@ -22,39 +23,44 @@ const parseBtn = document.getElementById('parseBtn');
 const searchBtn = document.getElementById('searchBtn');
 const searchInput = document.getElementById('searchInput');
 const searchType = document.getElementById('searchType');
+const searchHelp = document.getElementById('searchHelp');
+const searchExamples = document.getElementById('searchExamples');
 const treeContainer = document.getElementById('treeContainer');
 const statusBadge = document.getElementById('statusBadge');
 
 // State
 let lastRenderedDom = null;
+let parserErrorMarker = null;
+let parserErrorRow = null;
+
+const searchGuides = {
+    id: {
+        placeholder: 'Örn: header-section',
+        help: 'ID değeri ile direkt arama yapın.',
+        examples: ['header-section', 'content', 'deep-node', 'footer']
+    },
+    bfs: {
+        placeholder: 'Örn: tag="div", class="card", id="deep-node"',
+        help: 'DOM ağacını seviye seviye gezer.',
+        examples: ['tag="div"', 'class="card"', 'id="deep-node"', 'class="item"']
+    },
+    dfs: {
+        placeholder: 'Örn: tag="div", class="card", id="deep-node"',
+        help: 'DOM ağacında bir dalı sonuna kadar takip eder.',
+        examples: ['tag="div"', 'class="card"', 'id="deep-node"', 'href="#home"']
+    }
+};
+
+// Dropdown değiştiğinde placeholder'ı güncelle
+searchType.addEventListener('change', updateSearchGuide);
+
+updateSearchGuide();
 
 // Event Listeners
 parseBtn.addEventListener('click', async () => {
-    const htmlContent = editor.getValue();
-    
-    if (!htmlContent.trim()) {
-        showStatus('HTML içeriği boş!', 'error');
-        return;
-    }
-
     try {
         setLoading(true);
-        const response = await fetch(`${API_BASE}/parse`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ htmlContent })
-        });
-
-        if (!response.ok) throw new Error('API Hatası');
-
-        const treeData = await response.json();
-        lastRenderedDom = treeData;
-        renderTree(treeData);
-        showStatus('Ağaç Oluşturuldu', 'success');
-    } catch (error) {
-        console.error(error);
-        showStatus('Sunucuya Bağlanılamadı', 'error');
-        treeContainer.innerHTML = `<div class="empty-state"><p style="color: #ef4444;">API'ye bağlanılamadı. C# projesinin çalıştığından emin olun.</p></div>`;
+        await parseCurrentHtml();
     } finally {
         setLoading(false);
     }
@@ -65,33 +71,125 @@ searchBtn.addEventListener('click', async () => {
     if (!query) return;
 
     const type = searchType.value;
+    if (!isValidSearchQuery(type, query)) {
+        showStatus('BFS/DFS için format: key="value" veya key=value. Örn: class="container"', 'error');
+        return;
+    }
+
     const htmlContent = editor.getValue();
 
     try {
         setLoading(true);
+
+        if (!lastRenderedDom) {
+            const parsed = await parseCurrentHtml();
+            if (!parsed) return;
+        }
+
         const response = await fetch(`${API_BASE}/search`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ htmlContent, query, searchType: type })
         });
 
-        if (!response.ok) throw new Error('Arama Hatası');
+        if (!response.ok) {
+            throwApiError(await getApiErrorMessage(response, 'Arama Hatası'));
+        }
 
-        const results = await response.json();
-        highlightResults(results);
+        const data = await response.json();
+        highlightResults(data.results);
         
-        if(results.length > 0) {
-            showStatus(`${results.length} sonuç bulundu (${type})`, 'success');
+        if(data.count > 0) {
+            showStatus(`${data.count} sonuç bulundu — ${getSearchTypeLabel(type)} — ${data.elapsedMs.toFixed(2)} ms`, 'success');
         } else {
-            showStatus('Sonuç bulunamadı', 'error');
+            showStatus(`Sonuç bulunamadı — ${getSearchTypeLabel(type)}`, 'error');
         }
     } catch (error) {
         console.error(error);
-        showStatus('Arama Başarısız', 'error');
+        if (error.isApiError) {
+            lastRenderedDom = null;
+            clearStats();
+            showStatus('HTML Hatası', 'error');
+            renderParserError(error.message);
+            highlightParserErrorLine(error.message);
+        } else {
+            showStatus('Arama Başarısız', 'error');
+        }
     } finally {
         setLoading(false);
     }
 });
+
+function updateSearchGuide() {
+    const guide = searchGuides[searchType.value] || searchGuides.id;
+    searchInput.placeholder = guide.placeholder;
+    searchHelp.textContent = guide.help;
+    searchExamples.innerHTML = '';
+
+    guide.examples.forEach(example => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'example-chip';
+        button.textContent = example;
+        button.addEventListener('click', () => {
+            searchInput.value = example;
+            searchInput.focus();
+        });
+        searchExamples.appendChild(button);
+    });
+}
+
+function isValidSearchQuery(type, query) {
+    if (type === 'id') return true;
+    return /^[a-zA-Z][\w:-]*\s*=\s*("[^"]+"|'[^']+'|[^\s=]+)$/.test(query);
+}
+
+function getSearchTypeLabel(type) {
+    if (type === 'bfs') return 'BFS ile seviye seviye arandı';
+    if (type === 'dfs') return 'DFS ile derinlemesine arandı';
+    return 'ID hash tablosu ile direkt arandı';
+}
+
+async function parseCurrentHtml() {
+    const htmlContent = editor.getValue();
+    
+    if (!htmlContent.trim()) {
+        lastRenderedDom = null;
+        clearStats();
+        clearParserErrorHighlight();
+        showStatus('HTML içeriği boş!', 'error');
+        return false;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE}/parse`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ htmlContent })
+        });
+
+        if (!response.ok) {
+            throwApiError(await getApiErrorMessage(response, 'API Hatası'));
+        }
+
+        const data = await response.json();
+        lastRenderedDom = data.tree;
+        clearParserErrorHighlight();
+        renderTree(data.tree);
+        showStats(data.totalNodes, data.treeDepth, data.elapsedMs);
+        showStatus('Ağaç Oluşturuldu', 'success');
+        return true;
+    } catch (error) {
+        console.error(error);
+        lastRenderedDom = null;
+        clearStats();
+        const message = error.isApiError ? error.message : 'Sunucuya Bağlanılamadı';
+        showStatus(error.isApiError ? 'HTML Hatası' : message, 'error');
+        renderParserError(message);
+        highlightParserErrorLine(message);
+        return false;
+    }
+}
 
 function setLoading(isLoading) {
     parseBtn.disabled = isLoading;
@@ -106,14 +204,106 @@ function setLoading(isLoading) {
 function showStatus(text, type) {
     statusBadge.textContent = text;
     if (type === 'error') {
-        statusBadge.style.color = '#ef4444';
-        statusBadge.style.background = 'rgba(239, 68, 68, 0.2)';
-        statusBadge.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+        statusBadge.style.color = '#b91c1c';
+        statusBadge.style.background = '#fee2e2';
+        statusBadge.style.borderColor = '#fecaca';
     } else {
-        statusBadge.style.color = '#10b981';
-        statusBadge.style.background = 'rgba(16, 185, 129, 0.2)';
-        statusBadge.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+        statusBadge.style.color = '#15803d';
+        statusBadge.style.background = '#dcfce7';
+        statusBadge.style.borderColor = '#bbf7d0';
     }
+}
+
+function showStats(totalNodes, treeDepth, elapsedMs) {
+    const statsContainer = document.getElementById('statsContainer');
+    if (statsContainer) {
+        statsContainer.innerHTML = `
+            <div class="stat-item">
+                <span class="stat-label">Düğüm Sayısı</span>
+                <span class="stat-value">${totalNodes}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Ağaç Derinliği</span>
+                <span class="stat-value">${treeDepth}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Parse Süresi</span>
+                <span class="stat-value">${elapsedMs.toFixed(2)} ms</span>
+            </div>
+        `;
+    }
+}
+
+function clearStats() {
+    const statsContainer = document.getElementById('statsContainer');
+    if (statsContainer) {
+        statsContainer.innerHTML = '';
+    }
+}
+
+async function getApiErrorMessage(response, fallback) {
+    const contentType = response.headers.get('content-type') || '';
+
+    if (contentType.includes('application/json')) {
+        const body = await response.json();
+        return body.message || body.title || body.detail || fallback;
+    }
+
+    const message = await response.text();
+    return message || fallback;
+}
+
+function throwApiError(message) {
+    const error = new Error(message);
+    error.isApiError = true;
+    throw error;
+}
+
+function renderParserError(message) {
+    treeContainer.innerHTML = '';
+
+    const emptyState = document.createElement('div');
+    emptyState.className = 'empty-state';
+
+    const errorText = document.createElement('p');
+    errorText.style.color = '#ef4444';
+    errorText.textContent = message;
+
+    emptyState.appendChild(errorText);
+    treeContainer.appendChild(emptyState);
+}
+
+function highlightParserErrorLine(message) {
+    clearParserErrorHighlight();
+
+    const match = message.match(/Satır:\s*(\d+)/);
+    if (!match) return;
+
+    const lineNumber = Number(match[1]);
+    if (!Number.isInteger(lineNumber) || lineNumber < 1) return;
+
+    const row = lineNumber - 1;
+    const lineLength = editor.session.getLine(row).length;
+    parserErrorMarker = editor.session.addMarker(new Range(row, 0, row, Math.max(lineLength, 1)), 'parser-error-line', 'fullLine', false);
+    parserErrorRow = row;
+    editor.session.addGutterDecoration(row, 'parser-error-gutter');
+    editor.session.setAnnotations([{ row, column: 0, text: message, type: 'error' }]);
+    editor.gotoLine(lineNumber, 0, true);
+    editor.focus();
+}
+
+function clearParserErrorHighlight() {
+    if (parserErrorMarker !== null) {
+        editor.session.removeMarker(parserErrorMarker);
+        parserErrorMarker = null;
+    }
+
+    if (parserErrorRow !== null) {
+        editor.session.removeGutterDecoration(parserErrorRow, 'parser-error-gutter');
+        parserErrorRow = null;
+    }
+
+    editor.session.clearAnnotations();
 }
 
 // Tree Rendering Logic
