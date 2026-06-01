@@ -33,8 +33,16 @@ public class ParserController : ControllerBase
             return BadRequest("HTML içeriği boş olamaz.");
         }
 
-        var parser = new HtmlParser();
-        var tree = parser.Parse(request.HtmlContent);
+        NaryTree tree;
+        try
+        {
+            var parser = new HtmlParser();
+            tree = parser.Parse(request.HtmlContent);
+        }
+        catch (FormatException ex)
+        {
+            return BadRequest(ex.Message);
+        }
 
         // Kendi yazdığımız yapıları JSON olarak sorunsuz gönderebilmek için DTO'ya çeviriyoruz
         var dto = MapToDto(tree.Root);
@@ -49,8 +57,16 @@ public class ParserController : ControllerBase
             return BadRequest("Geçersiz arama isteği.");
         }
 
-        var parser = new HtmlParser();
-        var tree = parser.Parse(request.HtmlContent);
+        NaryTree tree;
+        try
+        {
+            var parser = new HtmlParser();
+            tree = parser.Parse(request.HtmlContent);
+        }
+        catch (FormatException ex)
+        {
+            return BadRequest(ex.Message);
+        }
 
         CustomList<DomNode> searchResults = new CustomList<DomNode>();
 
