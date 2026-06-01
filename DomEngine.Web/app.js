@@ -23,6 +23,8 @@ const parseBtn = document.getElementById('parseBtn');
 const searchBtn = document.getElementById('searchBtn');
 const searchInput = document.getElementById('searchInput');
 const searchType = document.getElementById('searchType');
+const searchHelp = document.getElementById('searchHelp');
+const searchExamples = document.getElementById('searchExamples');
 const treeContainer = document.getElementById('treeContainer');
 const statusBadge = document.getElementById('statusBadge');
 
@@ -31,27 +33,135 @@ let lastRenderedDom = null;
 let parserErrorMarker = null;
 let parserErrorRow = null;
 
-// Dropdown değiştiğinde placeholder'ı güncelle
-searchType.addEventListener('change', () => {
-    if (searchType.value === 'id') {
-        searchInput.placeholder = 'Örn: header, content, footer...';
-    } else {
-        searchInput.placeholder = 'Örn: class="container" veya tag="div"';
+const searchGuides = {
+    id: {
+        placeholder: 'Örn: header-section',
+        help: 'ID araması için sadece id değerini yazın. Örn: header-section',
+        examples: ['header-section', 'content', 'deep-node', 'footer']
+    },
+    bfs: {
+        placeholder: 'Örn: tag="div", class="card", id="deep-node"',
+        help: 'BFS araması key="value" veya key=value formatı kullanır ve DOM ağacını seviye seviye gezer.',
+        examples: ['tag="div"', 'class="card"', 'id="deep-node"', 'class="item"']
+    },
+    dfs: {
+        placeholder: 'Örn: tag="div", class="card", id="deep-node"',
+        help: 'DFS araması key="value" veya key=value formatı kullanır ve DOM ağacında bir dalı sonuna kadar takip eder.',
+        examples: ['tag="div"', 'class="card"', 'id="deep-node"', 'href="#home"']
     }
-});
+};
+
+// Dropdown değiştiğinde placeholder'ı güncelle
+searchType.addEventListener('change', updateSearchGuide);
+
+updateSearchGuide();
 
 // Event Listeners
 parseBtn.addEventListener('click', async () => {
-    const htmlContent = editor.getValue();
-    
-    if (!htmlContent.trim()) {
-        clearParserErrorHighlight();
-        showStatus('HTML içeriği boş!', 'error');
+    try {
+        setLoading(true);
+        await parseCurrentHtml();
+    } finally {
+        setLoading(false);
+    }
+});
+
+searchBtn.addEventListener('click', async () => {
+    const query = searchInput.value.trim();
+    if (!query) return;
+
+    const type = searchType.value;
+    if (!isValidSearchQuery(type, query)) {
+        showStatus('BFS/DFS için format: key="value" veya key=value. Örn: class="container"', 'error');
         return;
     }
 
+    const htmlContent = editor.getValue();
+
     try {
         setLoading(true);
+
+        if (!lastRenderedDom) {
+            const parsed = await parseCurrentHtml();
+            if (!parsed) return;
+        }
+
+        const response = await fetch(`${API_BASE}/search`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ htmlContent, query, searchType: type })
+        });
+
+        if (!response.ok) {
+            throwApiError(await getApiErrorMessage(response, 'Arama Hatası'));
+        }
+
+        const data = await response.json();
+        highlightResults(data.results);
+        
+        if(data.count > 0) {
+            showStatus(`${data.count} sonuç bulundu — ${getSearchTypeLabel(type)} — ${data.elapsedMs.toFixed(2)} ms`, 'success');
+        } else {
+            showStatus(`Sonuç bulunamadı — ${getSearchTypeLabel(type)}`, 'error');
+        }
+    } catch (error) {
+        console.error(error);
+        if (error.isApiError) {
+            lastRenderedDom = null;
+            clearStats();
+            showStatus('HTML Hatası', 'error');
+            renderParserError(error.message);
+            highlightParserErrorLine(error.message);
+        } else {
+            showStatus('Arama Başarısız', 'error');
+        }
+    } finally {
+        setLoading(false);
+    }
+});
+
+function updateSearchGuide() {
+    const guide = searchGuides[searchType.value] || searchGuides.id;
+    searchInput.placeholder = guide.placeholder;
+    searchHelp.textContent = guide.help;
+    searchExamples.innerHTML = '';
+
+    guide.examples.forEach(example => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'example-chip';
+        button.textContent = example;
+        button.addEventListener('click', () => {
+            searchInput.value = example;
+            searchInput.focus();
+        });
+        searchExamples.appendChild(button);
+    });
+}
+
+function isValidSearchQuery(type, query) {
+    if (type === 'id') return true;
+    return /^[a-zA-Z][\w:-]*\s*=\s*("[^"]+"|'[^']+'|[^\s=]+)$/.test(query);
+}
+
+function getSearchTypeLabel(type) {
+    if (type === 'bfs') return 'BFS ile seviye seviye arandı';
+    if (type === 'dfs') return 'DFS ile derinlemesine arandı';
+    return 'ID hash tablosu ile direkt arandı';
+}
+
+async function parseCurrentHtml() {
+    const htmlContent = editor.getValue();
+    
+    if (!htmlContent.trim()) {
+        lastRenderedDom = null;
+        clearStats();
+        clearParserErrorHighlight();
+        showStatus('HTML içeriği boş!', 'error');
+        return false;
+    }
+
+    try {
         const response = await fetch(`${API_BASE}/parse`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -68,57 +178,18 @@ parseBtn.addEventListener('click', async () => {
         renderTree(data.tree);
         showStats(data.totalNodes, data.treeDepth, data.elapsedMs);
         showStatus('Ağaç Oluşturuldu', 'success');
+        return true;
     } catch (error) {
         console.error(error);
+        lastRenderedDom = null;
+        clearStats();
         const message = error.isApiError ? error.message : 'Sunucuya Bağlanılamadı';
         showStatus(error.isApiError ? 'HTML Hatası' : message, 'error');
         renderParserError(message);
         highlightParserErrorLine(message);
-    } finally {
-        setLoading(false);
+        return false;
     }
-});
-
-searchBtn.addEventListener('click', async () => {
-    const query = searchInput.value.trim();
-    if (!query) return;
-
-    const type = searchType.value;
-    const htmlContent = editor.getValue();
-
-    try {
-        setLoading(true);
-        const response = await fetch(`${API_BASE}/search`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ htmlContent, query, searchType: type })
-        });
-
-        if (!response.ok) {
-            throwApiError(await getApiErrorMessage(response, 'Arama Hatası'));
-        }
-
-        const data = await response.json();
-        highlightResults(data.results);
-        
-        if(data.count > 0) {
-            showStatus(`${data.count} sonuç bulundu (${type.toUpperCase()}) — ${data.elapsedMs.toFixed(2)} ms`, 'success');
-        } else {
-            showStatus('Sonuç bulunamadı', 'error');
-        }
-    } catch (error) {
-        console.error(error);
-        if (error.isApiError) {
-            showStatus('HTML Hatası', 'error');
-            renderParserError(error.message);
-            highlightParserErrorLine(error.message);
-        } else {
-            showStatus('Arama Başarısız', 'error');
-        }
-    } finally {
-        setLoading(false);
-    }
-});
+}
 
 function setLoading(isLoading) {
     parseBtn.disabled = isLoading;
@@ -160,6 +231,13 @@ function showStats(totalNodes, treeDepth, elapsedMs) {
                 <span class="stat-value">${elapsedMs.toFixed(2)} ms</span>
             </div>
         `;
+    }
+}
+
+function clearStats() {
+    const statsContainer = document.getElementById('statsContainer');
+    if (statsContainer) {
+        statsContainer.innerHTML = '';
     }
 }
 
