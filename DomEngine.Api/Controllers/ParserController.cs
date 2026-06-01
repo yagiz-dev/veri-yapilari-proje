@@ -37,8 +37,16 @@ public class ParserController : ControllerBase
         // Stopwatch ile süre ölçümü
         var watch = Stopwatch.StartNew();
 
-        var parser = new HtmlParser();
-        var tree = parser.Parse(request.HtmlContent);
+        NaryTree tree;
+        try
+        {
+            var parser = new HtmlParser();
+            tree = parser.Parse(request.HtmlContent);
+        }
+        catch (FormatException ex)
+        {
+            return BadRequest(ex.Message);
+        }
 
         watch.Stop();
 
@@ -62,8 +70,16 @@ public class ParserController : ControllerBase
             return BadRequest("Geçersiz arama isteği.");
         }
 
-        var parser = new HtmlParser();
-        var tree = parser.Parse(request.HtmlContent);
+        NaryTree tree;
+        try
+        {
+            var parser = new HtmlParser();
+            tree = parser.Parse(request.HtmlContent);
+        }
+        catch (FormatException ex)
+        {
+            return BadRequest(ex.Message);
+        }
 
         // Stopwatch ile süre ölçümü
         var watch = Stopwatch.StartNew();

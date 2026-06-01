@@ -208,6 +208,20 @@ body {
     font-size: 14px;
 }
 
+.ace_marker-layer .parser-error-line {
+    position: absolute;
+    background: rgba(239, 68, 68, 0.36);
+    border-left: 4px solid #ef4444;
+    box-sizing: border-box;
+    z-index: 20;
+}
+
+.ace_gutter-cell.parser-error-gutter {
+    background: rgba(239, 68, 68, 0.35);
+    color: #fecaca;
+    font-weight: 700;
+}
+
 /* Tree View */
 .tree-wrapper {
     flex: 1;
