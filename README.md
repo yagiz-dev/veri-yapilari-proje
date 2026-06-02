@@ -1,4 +1,4 @@
-# Veri Yapıları ile HTML'den DOM Ağacı Oluşturma Projesi
+# HTML'den DOM Ağacı Oluşturma Projesi
 
 ![Frontendimizi gösteren ekran fotoğrafı](./screenshot.png)
 
