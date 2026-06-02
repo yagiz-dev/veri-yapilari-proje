@@ -9,10 +9,10 @@ namespace DomEngine.Core.DataStructures;
 /// .NET'in yerleşik koleksiyonları kullanılmadan sıfırdan yazılmıştır.
 /// </summary>
 /// <typeparam name="T">Elemanların tipi.</typeparam>
-public class CustomList<T> : IEnumerable<T>
+public class ArdaList<T> : IEnumerable<T>
 {
-    private Node<T>? _head;
-    private Node<T>? _tail;
+    private ArdaNode<T>? _head;
+    private ArdaNode<T>? _tail;
     private int _count;
 
     public int Count => _count;
@@ -34,7 +34,7 @@ public class CustomList<T> : IEnumerable<T>
 
     public void Add(T item)
     {
-        var newNode = new Node<T>(item);
+        var newNode = new ArdaNode<T>(item);
 
         if (_head == null)
         {
@@ -51,7 +51,7 @@ public class CustomList<T> : IEnumerable<T>
         _count++;
     }
 
-    private Node<T> GetNodeAt(int index)
+    private ArdaNode<T> GetNodeAt(int index)
     {
         if (index < 0 || index >= _count)
         {

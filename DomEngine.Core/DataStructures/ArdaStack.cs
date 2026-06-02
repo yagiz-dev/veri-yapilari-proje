@@ -9,16 +9,16 @@ namespace DomEngine.Core.DataStructures;
 /// <typeparam name="T">Elemanların tipi.</typeparam> //T'nin üstüne gelince Bu açıklama gözüküyor
 
 
-public class CustomStack<T>
+public class ArdaStack<T>
 {
-    private Node<T>? _top;
+    private ArdaNode<T>? _top;
     private int _count;
 
     public int Count { get { return _count; } }
 
     public void Push(T item)
     {
-        var newNode = new Node<T>(item);
+        var newNode = new ArdaNode<T>(item);
 
         if (_top != null)
         {

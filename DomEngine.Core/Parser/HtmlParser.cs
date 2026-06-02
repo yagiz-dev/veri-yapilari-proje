@@ -6,7 +6,7 @@ namespace DomEngine.Core.Parser;
 
 /// <summary>
 /// Gelen HTML metnini tarayıp (tokenization) parçalara ayıran ve
-/// CustomStack kullanarak ErenNaryTree (DOM Ağacı) oluşturan motor.
+/// ArdaStack kullanarak ErenNaryTree (DOM Ağacı) oluşturan motor.
 /// </summary>
 public class HtmlParser
 {
@@ -16,8 +16,8 @@ public class HtmlParser
     public ErenNaryTree Parse(string html)
     {
         var tree = new ErenNaryTree("document");
-        var stack = new CustomStack<ErenDomNode>();
-        var tagStartIndexes = new CustomStack<int>();
+        var stack = new ArdaStack<ErenDomNode>();
+        var tagStartIndexes = new ArdaStack<int>();
         stack.Push(tree.Root);
         tagStartIndexes.Push(0);
 

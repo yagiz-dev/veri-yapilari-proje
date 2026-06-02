@@ -37,16 +37,16 @@ public static class YusufPehDomSearch
 
     /// <summary>
     /// Genişlik Öncelikli Arama (BFS - Breadth First Search) kullanarak arama yapar.
-    /// CustomQueue kullanarak seviye seviye tüm düğümleri ziyaret eder.
+    /// ArdaQueue kullanarak seviye seviye tüm düğümleri ziyaret eder.
     /// Zaman Karmaşıklığı: O(N) — N: toplam düğüm sayısı
     /// Uzay Karmaşıklığı: O(W) — W: ağacın en geniş seviyesindeki düğüm sayısı
     /// </summary>
-    public static CustomList<ErenDomNode> SearchBFS(ErenNaryTree tree, string searchKey, string searchValue)
+    public static ArdaList<ErenDomNode> SearchBFS(ErenNaryTree tree, string searchKey, string searchValue)
     {
-        var result = new CustomList<ErenDomNode>();
+        var result = new ArdaList<ErenDomNode>();
         if (tree.Root == null || string.IsNullOrWhiteSpace(searchValue)) return result;
 
-        var queue = new CustomQueue<ErenDomNode>();
+        var queue = new ArdaQueue<ErenDomNode>();
         queue.Enqueue(tree.Root);
 
         while (queue.Count > 0)
@@ -69,16 +69,16 @@ public static class YusufPehDomSearch
 
     /// <summary>
     /// Derinlik Öncelikli Arama (DFS - Depth First Search) kullanarak arama yapar.
-    /// CustomStack kullanarak bir dalı sonuna kadar takip eder, sonra geri döner.
+    /// ArdaStack kullanarak bir dalı sonuna kadar takip eder, sonra geri döner.
     /// Zaman Karmaşıklığı: O(N) — N: toplam düğüm sayısı
     /// Uzay Karmaşıklığı: O(D) — D: ağacın derinliği
     /// </summary>
-    public static CustomList<ErenDomNode> SearchDFS(ErenNaryTree tree, string searchKey, string searchValue)
+    public static ArdaList<ErenDomNode> SearchDFS(ErenNaryTree tree, string searchKey, string searchValue)
     {
-        var result = new CustomList<ErenDomNode>();
+        var result = new ArdaList<ErenDomNode>();
         if (tree.Root == null || string.IsNullOrWhiteSpace(searchValue)) return result;
 
-        var stack = new CustomStack<ErenDomNode>();
+        var stack = new ArdaStack<ErenDomNode>();
         stack.Push(tree.Root);
 
         while (stack.Count > 0)

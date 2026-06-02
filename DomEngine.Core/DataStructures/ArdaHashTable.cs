@@ -2,13 +2,13 @@ using System;
 
 namespace DomEngine.Core.DataStructures;
 
-public class HashNode<K, V>
+public class ArdaHashNode<K, V>
 {
     public K Key { get; set; }
     public V Value { get; set; }
-    public HashNode<K, V>? Next { get; set; }
+    public ArdaHashNode<K, V>? Next { get; set; }
 
-    public HashNode(K key, V value)
+    public ArdaHashNode(K key, V value)
     {
         Key = key;
         Value = value;
@@ -22,15 +22,15 @@ public class HashNode<K, V>
 /// </summary>
 /// <typeparam name="K">Anahtar tipi.</typeparam>
 /// <typeparam name="V">Değer tipi.</typeparam>
-public class CustomHashTable<K, V>
+public class ArdaHashTable<K, V>
 {
     private int capacity = 16;
-    private HashNode<K, V>?[] _buckets;
+    private ArdaHashNode<K, V>?[] _buckets;
     private int _count;
 
-    public CustomHashTable()
+    public ArdaHashTable()
     {
-        _buckets = new HashNode<K, V>[capacity];
+        _buckets = new ArdaHashNode<K, V>[capacity];
     }
 
     private int GetCustomHash(K key)
@@ -59,11 +59,11 @@ public class CustomHashTable<K, V>
         return Math.Abs(hash % _buckets.Length);
     }
 
-    private HashNode<K, V>[] ReHash()
+    private ArdaHashNode<K, V>[] ReHash()
     {
         var oldBuckets = _buckets;
         capacity *= 2;
-        _buckets = new HashNode<K, V>[capacity];
+        _buckets = new ArdaHashNode<K, V>[capacity];
         _count = 0;
 
         foreach (var head in oldBuckets)
@@ -97,7 +97,7 @@ public class CustomHashTable<K, V>
         }
 
         // Yeni node oluştur ve başa ekle (daha hızlı)
-        var newNode = new HashNode<K, V>(key, value);
+        var newNode = new ArdaHashNode<K, V>(key, value);
         newNode.Next = head;
         _buckets[index] = newNode;
         _count++;
@@ -162,9 +162,9 @@ public class CustomHashTable<K, V>
         }
     }
 
-    public CustomList<System.Collections.Generic.KeyValuePair<K, V>> GetAllPairs()
+    public ArdaList<System.Collections.Generic.KeyValuePair<K, V>> GetAllPairs()
     {
-        var list = new CustomList<System.Collections.Generic.KeyValuePair<K, V>>();
+        var list = new ArdaList<System.Collections.Generic.KeyValuePair<K, V>>();
         foreach (var head in _buckets)
         {
             var current = head;

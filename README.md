@@ -21,24 +21,24 @@ Kullanıcının projeyle etkileşime geçeceği katmandır. Kullanıcı bir HTML
 Projemizde C#'ın hazır veri yapıları yerine kendi veri yapılarımızı oluşturup kullandık. Detaylarını aşağıda görebilirsiniz.
 
 ### 1. Ağaç yapısı (ErenDomNode ve ErenNaryTree)
-- **ErenDomNode**: Ağaçtaki en küçük birimdir. Her bir node bir HTML dokümanındaki en küçük birim olan HTML elementlerini temsil eder. İçerisinde elementin adı, içindeki metni, bir üst seviyedeki elementi ve sahip olduğu attribute'ları barındıran tutan özel bir hash table barındırır. Altındaki diğer HTML elementlerini de bir CustomList içinde saklar.
+- **ErenDomNode**: Ağaçtaki en küçük birimdir. Her bir node bir HTML dokümanındaki en küçük birim olan HTML elementlerini temsil eder. İçerisinde elementin adı, içindeki metni, bir üst seviyedeki elementi ve sahip olduğu attribute'ları barındıran tutan özel bir hash table barındırır. Altındaki diğer HTML elementlerini de bir ArdaList  içinde saklar.
 
 - **ErenNaryTree**: Ağacın kendisidir. Ağaç içindeki hiyerarşiyi yönetir. Altına sınırsız sayıda node alabilen kök düğümü (root) tutar.
 Bir N-ary tree'de her düğümün N adet alt düğümü (çocuğu) olabilir. Ayrıca içinde `id` ile hızlı aramalar yapmak için bir hash table barındırır.
 
-### 2. Dinamik dizi (CustomList)
+### 2. Dinamik dizi (ArdaList)
 C#'taki standart liste yapısının elle yazılmış bir muadilidir. Çift yönlü bir bağlı liste mantığıyla oluşturulmuştur. Indexer yapısı sayesinde dinamik dizi gibi çalışır.
 
 DOM node'larının alt node'larını listelemek ve arama sonuçlarını saklamak için kullanılır. Listeye eleman ekleme veya indeksten eleman getirme işlemlerini yönetir.
 
-### 3. Hash Table (CustomHashTable)
+### 3. Hash Table (ArdaHashTable)
 Elementlere hızlı erişebilmemiz için Key-Value (Anahtar-Değer) şeklinde saklayan veri yapısıdır. Projede iki farklı yerde kullanılır:
 
 1. **ID İndeksi**: Ağaca eklenen ve bir ID'si olan her bir düğümü, id'yi anahtar (key) ve düğümün kendisini değer (value) olarak alıp hash table içinde indeksler. Aranan id'nin hash değeri hesaplanıp doğrudan ID'nin bulunduğu bucketa gidildiği için, ağaçta milyar tane bile düğüm olsa aradığımız düğüm O(1) zamanda yani neredeyse anında bulunur.
 2. **Element Attribute'ları:** Her bir DOM düğümü kendi HTML attribute'larını (Örn: `class="container"`) hash table yapısı içinde tutar. Bu sayede bir düğümün class'ı veya href'i sorgulandığında neredeyse O(1) sürede bulunur.
 
 **Çakışma Çözümü ve Performans:**
-Hash Table, hash çakışmalarını çözmek için **Zincirleme (Separate Chaining)** yöntemini kullanır. Yani aynı indekse düşen elemanlar `HashNode` kullanılarak tek yönlü bağlı liste kullanılarak birbirine bağlanır. 
+Hash Table, hash çakışmalarını çözmek için **Zincirleme (Separate Chaining)** yöntemini kullanır. Yani aynı indekse düşen elemanlar `ArdaHashNode` kullanılarak tek yönlü bağlı liste kullanılarak birbirine bağlanır. 
 
 Hashleme fonksiyonu, aşağıdaki formülü kullanarak şifreleme yapar:
 
@@ -53,13 +53,13 @@ Kullandığımız formül, kelimelerin harf değerlerini hesaplarken her aşamad
 
 Bu işlem, "ali" ve "ila" gibi anagram kelimelerin aynı hash değerini üreterek çakışmasını engelleyerek verilerin tabloya eşit dağılmasını sağlar. Tablonun doluluk oranı %75'i geçtiğinde, dizi boyutu iki katına çıkarıp tekrar hashleyerek hep O(1)'e yakın bir performans vermesini sağlar.
 
-### 4. Stack (yığın) yapısı: (CustomStack)
+### 4. Stack (yığın) yapısı: (ArdaStack)
 LIFO (Son Giren İlk Çıkar) prensibiyle çalışan veri yapısıdır.
 
 - **Parser'daki kullanımı**: HTML parse edilirken açılış etiketleri `<tag>` stack'e atılır (Push edilir). Kapanış etiketi `</tag>` geldiğinde stack'in en üstündeki elemanla eşleşip eşleşmediği kontrol edilerek çıkartılır (Pop). Bu sayede HTML etiketlerinin düzgün kapanıp kapanmadığı kontrol edilir.
 - **DFS'teki kullanımı**: Derinlik Öncelikli Arama (DFS) algoritması çalıştırılırken, gidilen yol stack'te tutularak ağacın en dibine (yapraklarına) kadar inilmesi sağlanır.
 
-### 5. Queue (kuyruk): (CustomQueue)
+### 5. Queue (kuyruk): (ArdaQueue)
 FIFO (İlk Giren İlk Çıkar) prensibiyle çalışır.
 - **BFS'teki kullanımı**: BFS algoritmasında, ağaç seviyelerini sırasıyla dolaşmak amacıyla kullanılmıştır. Düğümler kuyruğa alınır ve sırası gelenin çocukları (alt elementleri) tekrar kuyruğun sonuna eklenir.
 
@@ -68,7 +68,7 @@ HTML'i karakter karakter okuyarak token'lara ayıran bir Lexical Analyzer mantı
 
 Metni baştan sonra tararken `<` gördüğünde bir etiketin başlangıcı olduğunu algılayıp işaretler. Etiketin içinde `=` gördüğünde attribute olduğunu algılayıp işler.
 
-Kendi yazdığımız `CustomStack` yapısını kullanarak etiketleri ebeveyn-çocuk ilişkisiyle birbirine bağlar ve sonuç olarak bir `ErenNaryTree` ağacı oluşturur.
+Kendi yazdığımız `ArdaStack` yapısını kullanarak etiketleri ebeveyn-çocuk ilişkisiyle birbirine bağlar ve sonuç olarak bir `ErenNaryTree` ağacı oluşturur.
 
 ## Çalıştırma
 Projeyi hızlı bir şekilde çalıştırmak için Docker kullanabilirsiniz.
@@ -91,51 +91,51 @@ classDiagram
     %% KATMAN 1 — DataStructures (Veri Yapıları)
     %% ══════════════════════════════════════════════
 
-    class `Node~T~` {
+    class `ArdaNode~T~` {
         +T Data
-        +Node~T~? Next
-        +Node~T~? Prev
-        +Node(T data)
+        +ArdaNode~T~? Next
+        +ArdaNode~T~? Prev
+        +ArdaNode(T data)
     }
 
-    class `HashNode~K,V~` {
+    class `ArdaHashNode~K,V~` {
         +K Key
         +V Value
-        +HashNode~K,V~? Next
-        +HashNode(K key, V value)
+        +ArdaHashNode~K,V~? Next
+        +ArdaHashNode(K key, V value)
     }
 
-    class `CustomList~T~` {
-        -Node~T~? _head
-        -Node~T~? _tail
+    class `ArdaList~T~` {
+        -ArdaNode~T~? _head
+        -ArdaNode~T~? _tail
         -int _count
         +Add(T item) void
         +Remove(T item) bool
     }
 
-    class `CustomStack~T~` {
-        -Node~T~? _top
+    class `ArdaStack~T~` {
+        -ArdaNode~T~? _top
         +Push(T item) void
         +Pop() T
         +Peek() T
     }
 
-    class `CustomQueue~T~` {
-        -Node~T~? _head
-        -Node~T~? _tail
+    class `ArdaQueue~T~` {
+        -ArdaNode~T~? _head
+        -ArdaNode~T~? _tail
         +Enqueue(T item) void
         +Dequeue() T
         +Peek() T
     }
 
-    class `CustomHashTable~K,V~` {
+    class `ArdaHashTable~K,V~` {
         -int capacity
-        -HashNode~K,V~?[] _buckets
+        -ArdaHashNode~K,V~?[] _buckets
         +V this[K key]
         +Add(K key, V value) void
         +TryGetValue(K key, out V value) bool
         -GetCustomHash(K key) int
-        -ReHash() HashNode~K,V~[]
+        -ReHash() ArdaHashNode~K,V~[]
     }
 
     %% ══════════════════════════════════════════════
@@ -146,8 +146,8 @@ classDiagram
         +string TagName
         +string InnerText
         +ErenDomNode? Parent
-        +CustomList~ErenDomNode~ Children
-        +CustomHashTable~string，string~ Attributes
+        +ArdaList~ErenDomNode~ Children
+        +ArdaHashTable~string，string~ Attributes
         +string Id
         +string ClassName
         +ErenDomNode(string tagName)
@@ -156,7 +156,7 @@ classDiagram
 
     class ErenNaryTree {
         +ErenDomNode Root
-        -CustomHashTable~string，ErenDomNode~ _elementsById
+        -ArdaHashTable~string，ErenDomNode~ _elementsById
         +ErenNaryTree(string rootTagName)
         +RegisterNode(ErenDomNode node) void
         +GetElementById(string id) ErenDomNode?
@@ -173,8 +173,8 @@ classDiagram
 
     class YusufPehDomSearch {
         <<static>>
-        +SearchBFS(ErenNaryTree tree, string key, string value)$ CustomList~ErenDomNode~
-        +SearchDFS(ErenNaryTree tree, string key, string value)$ CustomList~ErenDomNode~
+        +SearchBFS(ErenNaryTree tree, string key, string value)$ ArdaList~ErenDomNode~
+        +SearchDFS(ErenNaryTree tree, string key, string value)$ ArdaList~ErenDomNode~
         +CalculateDepth(ErenDomNode node)$ int
         +CountNodes(ErenDomNode node)$ int
     }
@@ -183,37 +183,37 @@ classDiagram
     %%                 İLİŞKİLER
     %% ══════════════════════════════════════════════
 
-    `CustomList~T~` *-- `Node~T~` : içerir
-    `CustomStack~T~` *-- `Node~T~` : içerir
-    `CustomQueue~T~` *-- `Node~T~` : içerir
-    `CustomHashTable~K,V~` *-- `HashNode~K,V~` : içerir
+    `ArdaList~T~` *-- `Node~T~` : içerir
+    `ArdaStack~T~` *-- `Node~T~` : içerir
+    `ArdaQueue~T~` *-- `Node~T~` : içerir
+    `ArdaHashTable~K,V~` *-- `HashNode~K,V~` : içerir
     
     ErenNaryTree *-- ErenDomNode : Root
     ErenDomNode *-- ErenDomNode : Children
-    ErenDomNode --> `CustomList~ErenDomNode~` : tutar
-    ErenDomNode --> `CustomHashTable~string，string~` : Attributes
-    ErenNaryTree --> `CustomHashTable~string，ErenDomNode~` : _elementsById
+    ErenDomNode --> `ArdaList~ErenDomNode~` : tutar
+    ErenDomNode --> `ArdaHashTable~string，string~` : Attributes
+    ErenNaryTree --> `ArdaHashTable~string，ErenDomNode~` : _elementsById
 
     HtmlParser ..> ErenNaryTree : oluşturur «create»
-    HtmlParser ..> `CustomStack~T~` : kullanır «use»
-    YusufPehDomSearch..> `CustomQueue~T~` : BFS için «use»
-    YusufPehDomSearch ..> `CustomStack~T~` : DFS için «use»
+    HtmlParser ..> `ArdaStack~T~` : kullanır «use»
+    YusufPehDomSearch..> `ArdaQueue~T~` : BFS için «use»
+    YusufPehDomSearch ..> `ArdaStack~T~` : DFS için «use»
 ```
 
 ## Multiplicity (Çokluk) Tablosu
 
 | İlişki Türü | Kaynak Sınıf | Hedef Sınıf | Çokluk | Açıklama |
 |-------------|-------------|------------|--------|----------|
-| Composition | `CustomList<T>` | `Node<T>` | 1 → 0..* | Liste sıfır veya daha fazla düğüm içerir |
-| Composition | `CustomStack<T>` | `Node<T>` | 1 → 0..* | Stack sıfır veya daha fazla düğüm içerir |
-| Composition | `CustomQueue<T>` | `Node<T>` | 1 → 0..* | Queue sıfır veya daha fazla düğüm içerir |
-| Composition | `CustomHashTable<K,V>` | `HashNode<K,V>` | 1 → 0..* | Hash table sıfır veya daha fazla hash düğümü içerir |
+| Composition | `ArdaList<T>` | `Node<T>` | 1 → 0..* | Liste sıfır veya daha fazla düğüm içerir |
+| Composition | `ArdaStack<T>` | `Node<T>` | 1 → 0..* | Stack sıfır veya daha fazla düğüm içerir |
+| Composition | `ArdaQueue<T>` | `Node<T>` | 1 → 0..* | Queue sıfır veya daha fazla düğüm içerir |
+| Composition | `ArdaHashTable<K,V>` | `HashNode<K,V>` | 1 → 0..* | Hash table sıfır veya daha fazla hash düğümü içerir |
 | Composition | `ErenNaryTree` | `ErenDomNode` | 1 → 1 | Her ağacın tam olarak bir kök düğümü vardır |
 | Composition | `ErenDomNode` | `ErenDomNode` | 1 → 0..* | Bir düğüm sıfır veya daha fazla çocuğa sahip olabilir |
 | Association | `ErenDomNode` | `ErenDomNode` | 0..* → 0..1 | Her çocuğun en fazla bir ebeveyni vardır (Parent) |
-| Association | `ErenDomNode` | `CustomHashTable<string,string>` | 1 → 1 | Her düğümün bir attribute tablosu vardır |
-| Association | `ErenNaryTree` | `CustomHashTable<string,ErenDomNode>` | 1 → 1 | Ağacın bir ID indeks tablosu vardır |
-| Realization | `CustomList<T>` | `IEnumerable<T>` | - | Interface implementasyonu |
+| Association | `ErenDomNode` | `ArdaHashTable<string,string>` | 1 → 1 | Her düğümün bir attribute tablosu vardır |
+| Association | `ErenNaryTree` | `ArdaHashTable<string,ErenDomNode>` | 1 → 1 | Ağacın bir ID indeks tablosu vardır |
+| Realization | `ArdaList<T>` | `IEnumerable<T>` | - | Interface implementasyonu |
 | Generalization | `ParserController` | `ControllerBase` | - | Kalıtım (Inheritance) |
 
 ## Algoritma Analizi
@@ -248,9 +248,9 @@ Ağaç üzerinde katman katman (yatay olarak) yapılan arama işlemidir. Kuyruk 
 
 | Algoritma | Zaman | Uzay | Kullandığı Yapı |
 |-----------|-------|------|-----------------|
-| BFS | O(N) | O(N) (N: en geniş seviye) | `CustomQueue<T>` |
-| DFS | O(N) | O(N) (N: ağaç derinliği) | `CustomStack<T>` |
-| ID ile arama | O(1) | O(1) | `CustomHashTable<K,V>` |
+| BFS | O(N) | O(N) (N: en geniş seviye) | `ArdaQueue<T>` |
+| DFS | O(N) | O(N) (N: ağaç derinliği) | `ArdaStack<T>` |
+| ID ile arama | O(1) | O(1) | `ArdaHashTable<K,V>` |
 
 ## Lisans
 Proje MIT lisansı altında lisanslanmıştır.

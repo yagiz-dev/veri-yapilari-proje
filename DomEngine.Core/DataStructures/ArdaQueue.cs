@@ -6,17 +6,17 @@ namespace DomEngine.Core.DataStructures;
 /// Ağaç üzerinde BFS (Genişlik Öncelikli Arama) aramaları yapmak için FIFO (First In First Out) yapısı.
 /// </summary>
 /// <typeparam name="T">Elemanların tipi.</typeparam>
-public class CustomQueue<T>
+public class ArdaQueue<T>
 {
-    private Node<T>? _head;
-    private Node<T>? _tail;
+    private ArdaNode<T>? _head;
+    private ArdaNode<T>? _tail;
     private int _count;
 
     public int Count => _count;
 
     public void Enqueue(T item)
     {
-        var newNode = new Node<T>(item);
+        var newNode = new ArdaNode<T>(item);
 
         if (_tail == null)
         {

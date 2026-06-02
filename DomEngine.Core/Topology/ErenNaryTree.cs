@@ -11,12 +11,12 @@ public class ErenNaryTree
     public ErenDomNode Root { get; private set; }
     
     // O(1) hızında id ile erişim sağlamak için oluşturulan Hash Table
-    private CustomHashTable<string, ErenDomNode> _elementsById;
+    private ArdaHashTable<string, ErenDomNode> _elementsById;
 
     public ErenNaryTree(string rootTagName = "html")
     {
         Root = new ErenDomNode(rootTagName);
-        _elementsById = new CustomHashTable<string, ErenDomNode>();
+        _elementsById = new ArdaHashTable<string, ErenDomNode>();
     }
 
     /// <summary>
