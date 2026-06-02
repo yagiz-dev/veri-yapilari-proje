@@ -20,10 +20,10 @@ Kullanıcının projeyle etkileşime geçeceği katmandır. Kullanıcı bir HTML
 ## Oluşturduğumuz Veri Yapıları
 Projemizde C#'ın hazır veri yapıları yerine kendi veri yapılarımızı oluşturup kullandık. Detaylarını aşağıda görebilirsiniz.
 
-### 1. Ağaç yapısı (DomNode ve NaryTree)
-- **DomNode**: Ağaçtaki en küçük birimdir. Her bir node bir HTML dokümanındaki en küçük birim olan HTML elementlerini temsil eder. İçerisinde elementin adı, içindeki metni, bir üst seviyedeki elementi ve sahip olduğu attribute'ları barındıran tutan özel bir hash table barındırır. Altındaki diğer HTML elementlerini de bir CustomList içinde saklar.
+### 1. Ağaç yapısı (ErenDomNode ve ErenNaryTree)
+- **ErenDomNode**: Ağaçtaki en küçük birimdir. Her bir node bir HTML dokümanındaki en küçük birim olan HTML elementlerini temsil eder. İçerisinde elementin adı, içindeki metni, bir üst seviyedeki elementi ve sahip olduğu attribute'ları barındıran tutan özel bir hash table barındırır. Altındaki diğer HTML elementlerini de bir CustomList içinde saklar.
 
-- **NaryTree**: Ağacın kendisidir. Ağaç içindeki hiyerarşiyi yönetir. Altına sınırsız sayıda node alabilen kök düğümü (root) tutar.
+- **ErenNaryTree**: Ağacın kendisidir. Ağaç içindeki hiyerarşiyi yönetir. Altına sınırsız sayıda node alabilen kök düğümü (root) tutar.
 Bir N-ary tree'de her düğümün N adet alt düğümü (çocuğu) olabilir. Ayrıca içinde `id` ile hızlı aramalar yapmak için bir hash table barındırır.
 
 ### 2. Dinamik dizi (CustomList)
@@ -68,7 +68,7 @@ HTML'i karakter karakter okuyarak token'lara ayıran bir Lexical Analyzer mantı
 
 Metni baştan sonra tararken `<` gördüğünde bir etiketin başlangıcı olduğunu algılayıp işaretler. Etiketin içinde `=` gördüğünde attribute olduğunu algılayıp işler.
 
-Kendi yazdığımız `CustomStack` yapısını kullanarak etiketleri ebeveyn-çocuk ilişkisiyle birbirine bağlar ve sonuç olarak bir `NaryTree` ağacı oluşturur.
+Kendi yazdığımız `CustomStack` yapısını kullanarak etiketleri ebeveyn-çocuk ilişkisiyle birbirine bağlar ve sonuç olarak bir `ErenNaryTree` ağacı oluşturur.
 
 ## Çalıştırma
 Projeyi hızlı bir şekilde çalıştırmak için Docker kullanabilirsiniz.
@@ -142,24 +142,24 @@ classDiagram
     %% KATMAN 2 — Topology (Ağaç Topolojisi)
     %% ══════════════════════════════════════════════
 
-    class DomNode {
+    class ErenDomNode {
         +string TagName
         +string InnerText
-        +DomNode? Parent
-        +CustomList~DomNode~ Children
+        +ErenDomNode? Parent
+        +CustomList~ErenDomNode~ Children
         +CustomHashTable~string，string~ Attributes
         +string Id
         +string ClassName
-        +DomNode(string tagName)
-        +AddChild(DomNode child) void
+        +ErenDomNode(string tagName)
+        +AddChild(ErenDomNode child) void
     }
 
-    class NaryTree {
-        +DomNode Root
-        -CustomHashTable~string，DomNode~ _elementsById
-        +NaryTree(string rootTagName)
-        +RegisterNode(DomNode node) void
-        +GetElementById(string id) DomNode?
+    class ErenNaryTree {
+        +ErenDomNode Root
+        -CustomHashTable~string，ErenDomNode~ _elementsById
+        +ErenNaryTree(string rootTagName)
+        +RegisterNode(ErenDomNode node) void
+        +GetElementById(string id) ErenDomNode?
     }
 
     %% ══════════════════════════════════════════════
@@ -167,16 +167,16 @@ classDiagram
     %% ══════════════════════════════════════════════
 
     class HtmlParser {
-        +Parse(string html) NaryTree
+        +Parse(string html) ErenNaryTree
         -ParseTagAttributes(...) void
     }
 
     class DomSearch {
         <<static>>
-        +SearchBFS(NaryTree tree, string key, string value)$ CustomList~DomNode~
-        +SearchDFS(NaryTree tree, string key, string value)$ CustomList~DomNode~
-        +CalculateDepth(DomNode node)$ int
-        +CountNodes(DomNode node)$ int
+        +SearchBFS(ErenNaryTree tree, string key, string value)$ CustomList~ErenDomNode~
+        +SearchDFS(ErenNaryTree tree, string key, string value)$ CustomList~ErenDomNode~
+        +CalculateDepth(ErenDomNode node)$ int
+        +CountNodes(ErenDomNode node)$ int
     }
 
     %% ══════════════════════════════════════════════
@@ -188,13 +188,13 @@ classDiagram
     `CustomQueue~T~` *-- `Node~T~` : içerir
     `CustomHashTable~K,V~` *-- `HashNode~K,V~` : içerir
     
-    NaryTree *-- DomNode : Root
-    DomNode *-- DomNode : Children
-    DomNode --> `CustomList~DomNode~` : tutar
-    DomNode --> `CustomHashTable~string，string~` : Attributes
-    NaryTree --> `CustomHashTable~string，DomNode~` : _elementsById
+    ErenNaryTree *-- ErenDomNode : Root
+    ErenDomNode *-- ErenDomNode : Children
+    ErenDomNode --> `CustomList~ErenDomNode~` : tutar
+    ErenDomNode --> `CustomHashTable~string，string~` : Attributes
+    ErenNaryTree --> `CustomHashTable~string，ErenDomNode~` : _elementsById
 
-    HtmlParser ..> NaryTree : oluşturur «create»
+    HtmlParser ..> ErenNaryTree : oluşturur «create»
     HtmlParser ..> `CustomStack~T~` : kullanır «use»
     DomSearch ..> `CustomQueue~T~` : BFS için «use»
     DomSearch ..> `CustomStack~T~` : DFS için «use»
@@ -208,11 +208,11 @@ classDiagram
 | Composition | `CustomStack<T>` | `Node<T>` | 1 → 0..* | Stack sıfır veya daha fazla düğüm içerir |
 | Composition | `CustomQueue<T>` | `Node<T>` | 1 → 0..* | Queue sıfır veya daha fazla düğüm içerir |
 | Composition | `CustomHashTable<K,V>` | `HashNode<K,V>` | 1 → 0..* | Hash table sıfır veya daha fazla hash düğümü içerir |
-| Composition | `NaryTree` | `DomNode` | 1 → 1 | Her ağacın tam olarak bir kök düğümü vardır |
-| Composition | `DomNode` | `DomNode` | 1 → 0..* | Bir düğüm sıfır veya daha fazla çocuğa sahip olabilir |
-| Association | `DomNode` | `DomNode` | 0..* → 0..1 | Her çocuğun en fazla bir ebeveyni vardır (Parent) |
-| Association | `DomNode` | `CustomHashTable<string,string>` | 1 → 1 | Her düğümün bir attribute tablosu vardır |
-| Association | `NaryTree` | `CustomHashTable<string,DomNode>` | 1 → 1 | Ağacın bir ID indeks tablosu vardır |
+| Composition | `ErenNaryTree` | `ErenDomNode` | 1 → 1 | Her ağacın tam olarak bir kök düğümü vardır |
+| Composition | `ErenDomNode` | `ErenDomNode` | 1 → 0..* | Bir düğüm sıfır veya daha fazla çocuğa sahip olabilir |
+| Association | `ErenDomNode` | `ErenDomNode` | 0..* → 0..1 | Her çocuğun en fazla bir ebeveyni vardır (Parent) |
+| Association | `ErenDomNode` | `CustomHashTable<string,string>` | 1 → 1 | Her düğümün bir attribute tablosu vardır |
+| Association | `ErenNaryTree` | `CustomHashTable<string,ErenDomNode>` | 1 → 1 | Ağacın bir ID indeks tablosu vardır |
 | Realization | `CustomList<T>` | `IEnumerable<T>` | - | Interface implementasyonu |
 | Generalization | `ParserController` | `ControllerBase` | - | Kalıtım (Inheritance) |
 

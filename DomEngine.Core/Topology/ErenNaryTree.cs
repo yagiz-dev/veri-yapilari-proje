@@ -6,24 +6,24 @@ namespace DomEngine.Core.Topology;
 /// Sınırsız alt çocuk düğüm destekleyen asıl ağaç yapısı.
 /// Tüm HTML belgesini (Document) temsil eder.
 /// </summary>
-public class NaryTree
+public class ErenNaryTree
 {
-    public DomNode Root { get; private set; }
+    public ErenDomNode Root { get; private set; }
     
     // O(1) hızında id ile erişim sağlamak için oluşturulan Hash Table
-    private CustomHashTable<string, DomNode> _elementsById;
+    private CustomHashTable<string, ErenDomNode> _elementsById;
 
-    public NaryTree(string rootTagName = "html")
+    public ErenNaryTree(string rootTagName = "html")
     {
-        Root = new DomNode(rootTagName);
-        _elementsById = new CustomHashTable<string, DomNode>();
+        Root = new ErenDomNode(rootTagName);
+        _elementsById = new CustomHashTable<string, ErenDomNode>();
     }
 
     /// <summary>
     /// Ağaca yeni bir düğüm eklendiğinde, eğer id'si varsa Hash Table'a kaydeder.
     /// Böylece GetElementById O(1) sürede çalışır.
     /// </summary>
-    public void RegisterNode(DomNode node)
+    public void RegisterNode(ErenDomNode node)
     {
         string id = node.Id;
         if (!string.IsNullOrEmpty(id))
@@ -37,9 +37,9 @@ public class NaryTree
     /// <summary>
     /// O(1) karmaşıklığında, ağaçta arama yapmadan doğrudan Hash Table üzerinden düğümü bulur.
     /// </summary>
-    public DomNode? GetElementById(string id)
+    public ErenDomNode? GetElementById(string id)
     {
-        if (_elementsById.TryGetValue(id, out DomNode node))
+        if (_elementsById.TryGetValue(id, out ErenDomNode node))
         {
             return node;
         }
@@ -49,7 +49,7 @@ public class NaryTree
     /// <summary>
     /// Kök düğüme veya belirtilen ebeveyn düğüme yeni bir çocuk ekler.
     /// </summary>
-    public void AddNode(DomNode parent, DomNode child)
+    public void AddNode(ErenDomNode parent, ErenDomNode child)
     {
         if (parent == null)
         {

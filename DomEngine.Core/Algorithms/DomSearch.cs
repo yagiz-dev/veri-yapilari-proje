@@ -18,7 +18,7 @@ public static class DomSearch
     ///   href="#home"          → Düğümün href attribute'u "#home" mu?
     ///   (ve diğer tüm attribute'lar aynı şekilde çalışır)
     /// </summary>
-    private static bool IsMatch(DomNode node, string searchKey, string searchValue)
+    private static bool IsMatch(ErenDomNode node, string searchKey, string searchValue)
     {
         // "tag" özel durum: etiket ismi attribute'larda değil, TagName'de tutulur
         if (searchKey == "tag")
@@ -41,12 +41,12 @@ public static class DomSearch
     /// Zaman Karmaşıklığı: O(N) — N: toplam düğüm sayısı
     /// Uzay Karmaşıklığı: O(W) — W: ağacın en geniş seviyesindeki düğüm sayısı
     /// </summary>
-    public static CustomList<DomNode> SearchBFS(NaryTree tree, string searchKey, string searchValue)
+    public static CustomList<ErenDomNode> SearchBFS(ErenNaryTree tree, string searchKey, string searchValue)
     {
-        var result = new CustomList<DomNode>();
+        var result = new CustomList<ErenDomNode>();
         if (tree.Root == null || string.IsNullOrWhiteSpace(searchValue)) return result;
 
-        var queue = new CustomQueue<DomNode>();
+        var queue = new CustomQueue<ErenDomNode>();
         queue.Enqueue(tree.Root);
 
         while (queue.Count > 0)
@@ -73,12 +73,12 @@ public static class DomSearch
     /// Zaman Karmaşıklığı: O(N) — N: toplam düğüm sayısı
     /// Uzay Karmaşıklığı: O(D) — D: ağacın derinliği
     /// </summary>
-    public static CustomList<DomNode> SearchDFS(NaryTree tree, string searchKey, string searchValue)
+    public static CustomList<ErenDomNode> SearchDFS(ErenNaryTree tree, string searchKey, string searchValue)
     {
-        var result = new CustomList<DomNode>();
+        var result = new CustomList<ErenDomNode>();
         if (tree.Root == null || string.IsNullOrWhiteSpace(searchValue)) return result;
 
-        var stack = new CustomStack<DomNode>();
+        var stack = new CustomStack<ErenDomNode>();
         stack.Push(tree.Root);
 
         while (stack.Count > 0)
@@ -111,7 +111,7 @@ public static class DomSearch
     /// Zaman Karmaşıklığı: O(N) — her düğüm bir kez ziyaret edilir
     /// Uzay Karmaşıklığı: O(D) — rekürsiyon yığını derinliği kadar yer kaplar
     /// </summary>
-    public static int CalculateDepth(DomNode node)
+    public static int CalculateDepth(ErenDomNode node)
     {
         if (node == null || node.Children.Count == 0)
             return 0; // Yaprak düğüm veya null — derinlik 0
@@ -134,7 +134,7 @@ public static class DomSearch
     /// Zaman Karmaşıklığı: O(N) — her düğüm bir kez ziyaret edilir
     /// Uzay Karmaşıklığı: O(D) — rekürsiyon yığını
     /// </summary>
-    public static int CountNodes(DomNode node)
+    public static int CountNodes(ErenDomNode node)
     {
         if (node == null)
             return 0;

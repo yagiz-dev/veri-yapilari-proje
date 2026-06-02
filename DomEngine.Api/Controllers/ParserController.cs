@@ -37,7 +37,7 @@ public class ParserController : ControllerBase
         // Stopwatch ile süre ölçümü
         var watch = Stopwatch.StartNew();
 
-        NaryTree tree;
+        ErenNaryTree tree;
         try
         {
             var parser = new HtmlParser();
@@ -70,7 +70,7 @@ public class ParserController : ControllerBase
             return BadRequest("Geçersiz arama isteği.");
         }
 
-        NaryTree tree;
+        ErenNaryTree tree;
         try
         {
             var parser = new HtmlParser();
@@ -84,7 +84,7 @@ public class ParserController : ControllerBase
         // Stopwatch ile süre ölçümü
         var watch = Stopwatch.StartNew();
 
-        CustomList<DomNode> searchResults = new CustomList<DomNode>();
+        CustomList<ErenDomNode> searchResults = new CustomList<ErenDomNode>();
 
         if (request.SearchType == "id")
         {
@@ -133,7 +133,7 @@ public class ParserController : ControllerBase
     }
 
     // CustomTree -> JSON dostu DTO çevirici
-    private object MapToDto(DomNode node)
+    private object MapToDto(ErenDomNode node)
     {
         if (node == null) return null;
 
