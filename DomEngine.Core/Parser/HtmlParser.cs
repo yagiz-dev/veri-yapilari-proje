@@ -6,17 +6,17 @@ namespace DomEngine.Core.Parser;
 
 /// <summary>
 /// Gelen HTML metnini tarayıp (tokenization) parçalara ayıran ve
-/// CustomStack kullanarak NaryTree (DOM Ağacı) oluşturan motor.
+/// CustomStack kullanarak ErenNaryTree (DOM Ağacı) oluşturan motor.
 /// </summary>
 public class HtmlParser
 {
     // Kendi kendine kapanan (self-closing) etiketler. Bunlar stack'e atılmaz.
     private readonly string[] _selfClosingTags = { "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr" };
 
-    public NaryTree Parse(string html)
+    public ErenNaryTree Parse(string html)
     {
-        var tree = new NaryTree("document");
-        var stack = new CustomStack<DomNode>();
+        var tree = new ErenNaryTree("document");
+        var stack = new CustomStack<ErenDomNode>();
         var tagStartIndexes = new CustomStack<int>();
         stack.Push(tree.Root);
         tagStartIndexes.Push(0);
@@ -143,13 +143,13 @@ public class HtmlParser
                     ThrowHtmlError("Açılış etiketi boş olamaz.", html, i);
                 }
 
-                // Yeni DomNode oluştur
-                DomNode newNode = new DomNode("");
+                // Yeni ErenDomNode oluştur
+                ErenDomNode newNode = new ErenDomNode("");
                 
                 // Sınıf içindeki metotla TagName ve Nitelikleri (Attributes) ayrıştır
                 ParseTagAttributes(tagContent, newNode, html, tagContentStart);
                 
-                // ID'si varsa O(1) arama için NaryTree'nin Hash Table'ına kaydet
+                // ID'si varsa O(1) arama için ErenNaryTree'nin Hash Table'ına kaydet
                 tree.RegisterNode(newNode);
                 
                 // Ebeveynine bağla
@@ -264,7 +264,7 @@ public class HtmlParser
     /// Karakter karakter (tokenization) tarama işlemiyle nitelikleri (Attributes) ayrıştırır.
     /// Örn: div id="main" class="box"
     /// </summary>
-    private void ParseTagAttributes(string tagContent, DomNode node, string html, int tagContentStart)
+    private void ParseTagAttributes(string tagContent, ErenDomNode node, string html, int tagContentStart)
     {
         tagContent = tagContent.Trim();
 
