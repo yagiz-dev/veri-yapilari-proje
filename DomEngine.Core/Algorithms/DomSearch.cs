@@ -128,29 +128,6 @@ public static class DomSearch
     }
 
     /// <summary>
-    /// Bir düğümün kardeşlerini (siblings) bulur.
-    /// Kardeş = Aynı ebeveyne (parent) sahip olan diğer düğümler.
-    /// 
-    /// Zaman Karmaşıklığı: O(K) — K: kardeş sayısı (parent'ın çocuk sayısı)
-    /// Uzay Karmaşıklığı: O(K) — sonuç listesi için
-    /// </summary>
-    public static CustomList<DomNode> GetSiblings(DomNode node)
-    {
-        var siblings = new CustomList<DomNode>();
-
-        if (node == null || node.Parent == null)
-            return siblings; // Kök düğümün kardeşi yoktur
-
-        foreach (var child in node.Parent.Children)
-        {
-            if (child != node) // Kendisi hariç hepsini ekle
-                siblings.Add(child);
-        }
-
-        return siblings;
-    }
-
-    /// <summary>
     /// Bir düğümün altındaki (alt ağaç) toplam düğüm sayısını rekürsif olarak hesaplar.
     /// Kendisini de sayar (1 + çocukların altındakiler).
     /// 

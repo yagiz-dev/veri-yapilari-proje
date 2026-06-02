@@ -58,23 +58,4 @@ public class NaryTree
 
         parent.AddChild(child);
     }
-
-    /// <summary>
-    /// Ağaçtan bir düğümü siler.
-    /// </summary>
-    public bool RemoveNode(DomNode nodeToRemove)
-    {
-        if (nodeToRemove == null || nodeToRemove == Root)
-        {
-            return false; // Kök düğüm silinemez veya null olamaz
-        }
-
-        var parent = nodeToRemove.Parent;
-        if (parent != null)
-        {
-            return parent.Children.Remove(nodeToRemove);
-        }
-
-        return false;
-    }
 }

@@ -176,31 +176,4 @@ public class CustomHashTable<K, V>
         }
         return list;
     }
-
-    public void Remove(K key)
-    {
-        int index = GetBucketIndex(key);
-        var head = _buckets[index];
-        HashNode<K, V>? prev = null;
-        var current = head;
-
-        while (current != null)
-        {
-            if (current.Key!.Equals(key))
-            {
-                if (prev == null)
-                {
-                    _buckets[index] = current.Next;
-                }
-                else
-                {
-                    prev.Next = current.Next;
-                }
-                _count--;
-                return;
-            }
-            prev = current;
-            current = current.Next;
-        }
-    }
 }
