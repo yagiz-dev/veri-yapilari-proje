@@ -52,6 +52,13 @@ Son Giren İlk Çıkar (Last-In-First-Out) prensibiyle çalışan veri yapısıd
 ### 3.6. `HtmlParser` Ayrıştırıcı Motoru
 HTML metnini karakter karakter okuyarak token'lara (işaretçilere) ayıran Lexical Analyzer (Sözcük Analizcisi) mantığıyla çalışır. Metni baştan sona tarar; `<` gördüğünde etiket başlangıcı olarak işaretler, `=` gördüğünde nitelik ataması (attribute assignment) yapar. Özel yazdığımız `CustomStack` yapısını kullanarak kendi kendini kapatmayan etiketleri bellekte ebeveyn-çocuk ilişkisiyle (Tree Topology) birbirine bağlar ve sonuç olarak tam teşekküllü bir `NaryTree` döndürür.
 
+### 3.7. `DomSearch` Arama Algoritmaları
+Ağaç (DOM) üzerinde istenilen bir etiketi (tag), sınıfı (class) veya herhangi bir niteliği (attribute) bulmak için oluşturulmuş arama motorudur. Aramanın derinliğine veya genişliğine göre bellek/zaman optimizasyonu sağlayabilmek için iki farklı algoritma ile tasarlanmıştır:
+- **Genişlik Öncelikli Arama (BFS):** Hedef eleman ağacın kök (üst) katmanlarına yakın olduğunda tercih edilir. Tüm çocukları yatay seviyede, katman katman `CustomQueue` yardımıyla dolaşır.
+- **Derinlik Öncelikli Arama (DFS):** Hedef eleman ağacın çok derinlerinde (örneğin içiçe geçmiş çok sayıda `div`'in en altındaysa) tercih edilir. Dallar `CustomStack` yardımıyla en uca (yapraklara) kadar takip edilir ve ancak yol bittiğinde geri dönülür (Backtracking).
+
+Böylece kullanıcı veya API üzerinden gelen isteğin tipine göre, bellek (RAM) tüketimi kontrol altında tutularak en verimli arama gerçekleştirilir.
+
 ## 4. UML Diyagramı ve Algoritma Analizi
 
 Bu bölümde, projedeki sınıfların ilişkileri UML standartlarına uygun olarak modellenmiş ve kullanılan arama algoritmalarının Zaman/Uzay karmaşıklıkları incelenmiştir.
