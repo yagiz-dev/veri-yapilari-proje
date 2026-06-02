@@ -40,7 +40,7 @@ public class ParserController : ControllerBase
         ErenNaryTree tree;
         try
         {
-            var parser = new HtmlParser();
+            var parser = new YagizhanHtmlParser();
             tree = parser.Parse(request.HtmlContent);
         }
         catch (FormatException ex)
@@ -73,7 +73,7 @@ public class ParserController : ControllerBase
         ErenNaryTree tree;
         try
         {
-            var parser = new HtmlParser();
+            var parser = new YagizhanHtmlParser();
             tree = parser.Parse(request.HtmlContent);
         }
         catch (FormatException ex)
