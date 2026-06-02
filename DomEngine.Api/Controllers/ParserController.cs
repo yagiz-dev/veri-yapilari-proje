@@ -56,8 +56,8 @@ public class ParserController : ControllerBase
         return Ok(new
         {
             tree = dto,
-            totalNodes = DomSearch.CountNodes(tree.Root),
-            treeDepth = DomSearch.CalculateDepth(tree.Root),
+            totalNodes = YusufPehDomSearch.CountNodes(tree.Root),
+            treeDepth = YusufPehDomSearch.CalculateDepth(tree.Root),
             elapsedMs = watch.Elapsed.TotalMilliseconds
         });
     }
@@ -108,11 +108,11 @@ public class ParserController : ControllerBase
 
             if (request.SearchType == "dfs")
             {
-                searchResults = DomSearch.SearchDFS(tree, searchKey, searchValue);
+                searchResults = YusufPehDomSearch.SearchDFS(tree, searchKey, searchValue);
             }
             else // bfs
             {
-                searchResults = DomSearch.SearchBFS(tree, searchKey, searchValue);
+                searchResults = YusufPehDomSearch.SearchBFS(tree, searchKey, searchValue);
             }
         }
 

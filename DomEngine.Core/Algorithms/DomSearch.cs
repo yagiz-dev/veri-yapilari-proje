@@ -7,7 +7,7 @@ namespace DomEngine.Core.Algorithms;
 /// <summary>
 /// DOM Ağacı üzerinde arama, gezinti (Traversal) ve analiz algoritmaları barındırır.
 /// </summary>
-public static class DomSearch
+public static class YusufPehDomSearch
 {
     /// <summary>
     /// Kullanıcının girdiği sorguya göre bir düğümün eşleşip eşleşmediğini kontrol eder.

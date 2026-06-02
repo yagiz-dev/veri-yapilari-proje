@@ -171,7 +171,7 @@ classDiagram
         -ParseTagAttributes(...) void
     }
 
-    class DomSearch {
+    class YusufPehDomSearch {
         <<static>>
         +SearchBFS(ErenNaryTree tree, string key, string value)$ CustomList~ErenDomNode~
         +SearchDFS(ErenNaryTree tree, string key, string value)$ CustomList~ErenDomNode~
@@ -196,8 +196,8 @@ classDiagram
 
     HtmlParser ..> ErenNaryTree : oluşturur «create»
     HtmlParser ..> `CustomStack~T~` : kullanır «use»
-    DomSearch ..> `CustomQueue~T~` : BFS için «use»
-    DomSearch ..> `CustomStack~T~` : DFS için «use»
+    YusufPehDomSearch..> `CustomQueue~T~` : BFS için «use»
+    YusufPehDomSearch ..> `CustomStack~T~` : DFS için «use»
 ```
 
 ## Multiplicity (Çokluk) Tablosu
