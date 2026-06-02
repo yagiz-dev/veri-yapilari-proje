@@ -12,17 +12,17 @@ public class ErenDomNode
     public ErenDomNode? Parent { get; set; }
     
     // Kendi yazdığımız liste sınıfı kullanılıyor
-    public CustomList<ErenDomNode> Children { get; private set; }
+    public ArdaList<ErenDomNode> Children { get; private set; }
     
     // Nitelikleri (id, class, src vb.) tutan HashTable
-    public CustomHashTable<string, string> Attributes { get; private set; }
+    public ArdaHashTable<string, string> Attributes { get; private set; }
 
     public ErenDomNode(string tagName)
     {
         TagName = tagName;
         InnerText = string.Empty;
-        Children = new CustomList<ErenDomNode>();
-        Attributes = new CustomHashTable<string, string>();
+        Children = new ArdaList<ErenDomNode>();
+        Attributes = new ArdaHashTable<string, string>();
     }
 
     /// <summary>

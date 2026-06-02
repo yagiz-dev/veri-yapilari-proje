@@ -84,7 +84,7 @@ public class ParserController : ControllerBase
         // Stopwatch ile süre ölçümü
         var watch = Stopwatch.StartNew();
 
-        CustomList<ErenDomNode> searchResults = new CustomList<ErenDomNode>();
+        ArdaList<ErenDomNode> searchResults = new ArdaList<ErenDomNode>();
 
         if (request.SearchType == "id")
         {
