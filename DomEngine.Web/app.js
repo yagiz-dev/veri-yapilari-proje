@@ -100,9 +100,9 @@ searchBtn.addEventListener('click', async () => {
         highlightResults(data.results);
         
         if(data.count > 0) {
-            showStatus(`${data.count} sonuç bulundu — ${getSearchTypeLabel(type)} — ${data.elapsedMs.toFixed(2)} ms`, 'success');
+            showStatus(`${data.elapsedMs.toFixed(2)} ms sürede ${data.count} sonuç bulundu`, 'success');
         } else {
-            showStatus(`Sonuç bulunamadı — ${getSearchTypeLabel(type)}`, 'error');
+            showStatus(`Sonuç bulunamadı: ${getSearchTypeLabel(type)}`, 'error');
         }
     } catch (error) {
         console.error(error);

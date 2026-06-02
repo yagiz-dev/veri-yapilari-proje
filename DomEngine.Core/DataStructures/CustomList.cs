@@ -51,39 +51,6 @@ public class CustomList<T> : IEnumerable<T>
         _count++;
     }
 
-    public bool Remove(T item)
-    {
-        var current = _head;
-        while (current != null)
-        {
-            if (EqualityComparer<T>.Default.Equals(current.Data, item))
-            {
-                if (current.Prev != null)
-                {
-                    current.Prev.Next = current.Next;
-                }
-                else
-                {
-                    _head = current.Next;
-                }
-
-                if (current.Next != null)
-                {
-                    current.Next.Prev = current.Prev;
-                }
-                else
-                {
-                    _tail = current.Prev;
-                }
-
-                _count--;
-                return true;
-            }
-            current = current.Next;
-        }
-        return false;
-    }
-
     private Node<T> GetNodeAt(int index)
     {
         if (index < 0 || index >= _count)
@@ -98,13 +65,6 @@ public class CustomList<T> : IEnumerable<T>
         }
 
         return current!;
-    }
-
-    public void Clear()
-    {
-        _head = null;
-        _tail = null;
-        _count = 0;
     }
 
     // Foreach döngülerinde kullanılabilmesi için IEnumerable implementasyonu
