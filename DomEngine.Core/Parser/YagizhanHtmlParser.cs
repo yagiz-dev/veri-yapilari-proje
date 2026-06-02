@@ -8,7 +8,7 @@ namespace DomEngine.Core.Parser;
 /// Gelen HTML metnini tarayıp (tokenization) parçalara ayıran ve
 /// ArdaStack kullanarak ErenNaryTree (DOM Ağacı) oluşturan motor.
 /// </summary>
-public class HtmlParser
+public class YagizhanHtmlParser
 {
     // Kendi kendine kapanan (self-closing) etiketler. Bunlar stack'e atılmaz.
     private readonly string[] _selfClosingTags = { "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr" };

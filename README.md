@@ -21,7 +21,7 @@ Kullanıcının projeyle etkileşime geçeceği katmandır. Kullanıcı bir HTML
 Projemizde C#'ın hazır veri yapıları yerine kendi veri yapılarımızı oluşturup kullandık. Detaylarını aşağıda görebilirsiniz.
 
 ### 1. Ağaç yapısı (ErenDomNode ve ErenNaryTree)
-- **ErenDomNode**: Ağaçtaki en küçük birimdir. Her bir node bir HTML dokümanındaki en küçük birim olan HTML elementlerini temsil eder. İçerisinde elementin adı, içindeki metni, bir üst seviyedeki elementi ve sahip olduğu attribute'ları barındıran tutan özel bir hash table barındırır. Altındaki diğer HTML elementlerini de bir ArdaList  içinde saklar.
+- **ErenDomNode**: Ağaçtaki en küçük birimdir. Her bir node bir HTML dokümanındaki en küçük birim olan HTML elementlerini temsil eder. İçerisinde elementin adı, içindeki metni, bir üst seviyedeki elementi ve sahip olduğu attribute'ları barındıran tutan özel bir hash table barındırır. Altındaki diğer HTML elementlerini de bir ArdaList içinde saklar.
 
 - **ErenNaryTree**: Ağacın kendisidir. Ağaç içindeki hiyerarşiyi yönetir. Altına sınırsız sayıda node alabilen kök düğümü (root) tutar.
 Bir N-ary tree'de her düğümün N adet alt düğümü (çocuğu) olabilir. Ayrıca içinde `id` ile hızlı aramalar yapmak için bir hash table barındırır.
@@ -166,7 +166,7 @@ classDiagram
     %% KATMAN 3 & 4 — Parser & Algorithms
     %% ══════════════════════════════════════════════
 
-    class HtmlParser {
+    class YagizhanHtmlParser {
         +Parse(string html) ErenNaryTree
         -ParseTagAttributes(...) void
     }
@@ -183,10 +183,10 @@ classDiagram
     %%                 İLİŞKİLER
     %% ══════════════════════════════════════════════
 
-    `ArdaList~T~` *-- `Node~T~` : içerir
-    `ArdaStack~T~` *-- `Node~T~` : içerir
-    `ArdaQueue~T~` *-- `Node~T~` : içerir
-    `ArdaHashTable~K,V~` *-- `HashNode~K,V~` : içerir
+    `ArdaList~T~` *-- `ArdaNode~T~` : içerir
+    `ArdaStack~T~` *-- `ArdaNode~T~` : içerir
+    `ArdaQueue~T~` *-- `ArdaNode~T~` : içerir
+    `ArdaHashTable~K,V~` *-- `ArdaHashNode~K,V~` : içerir
     
     ErenNaryTree *-- ErenDomNode : Root
     ErenDomNode *-- ErenDomNode : Children
@@ -194,8 +194,8 @@ classDiagram
     ErenDomNode --> `ArdaHashTable~string，string~` : Attributes
     ErenNaryTree --> `ArdaHashTable~string，ErenDomNode~` : _elementsById
 
-    HtmlParser ..> ErenNaryTree : oluşturur «create»
-    HtmlParser ..> `ArdaStack~T~` : kullanır «use»
+    YagizhanHtmlParser ..> ErenNaryTree : oluşturur «create»
+    YagizhanHtmlParser ..> `ArdaStack~T~` : kullanır «use»
     YusufPehDomSearch..> `ArdaQueue~T~` : BFS için «use»
     YusufPehDomSearch ..> `ArdaStack~T~` : DFS için «use»
 ```
@@ -204,10 +204,10 @@ classDiagram
 
 | İlişki Türü | Kaynak Sınıf | Hedef Sınıf | Çokluk | Açıklama |
 |-------------|-------------|------------|--------|----------|
-| Composition | `ArdaList<T>` | `Node<T>` | 1 → 0..* | Liste sıfır veya daha fazla düğüm içerir |
-| Composition | `ArdaStack<T>` | `Node<T>` | 1 → 0..* | Stack sıfır veya daha fazla düğüm içerir |
-| Composition | `ArdaQueue<T>` | `Node<T>` | 1 → 0..* | Queue sıfır veya daha fazla düğüm içerir |
-| Composition | `ArdaHashTable<K,V>` | `HashNode<K,V>` | 1 → 0..* | Hash table sıfır veya daha fazla hash düğümü içerir |
+| Composition | `ArdaList<T>` | `ArdaNode<T>` | 1 → 0..* | Liste sıfır veya daha fazla düğüm içerir |
+| Composition | `ArdaStack<T>` | `ArdaNode<T>` | 1 → 0..* | Stack sıfır veya daha fazla düğüm içerir |
+| Composition | `ArdaQueue<T>` | `ArdaNode<T>` | 1 → 0..* | Queue sıfır veya daha fazla düğüm içerir |
+| Composition | `ArdaHashTable<K,V>` | `ArdaHashNode<K,V>` | 1 → 0..* | Hash table sıfır veya daha fazla hash düğümü içerir |
 | Composition | `ErenNaryTree` | `ErenDomNode` | 1 → 1 | Her ağacın tam olarak bir kök düğümü vardır |
 | Composition | `ErenDomNode` | `ErenDomNode` | 1 → 0..* | Bir düğüm sıfır veya daha fazla çocuğa sahip olabilir |
 | Association | `ErenDomNode` | `ErenDomNode` | 0..* → 0..1 | Her çocuğun en fazla bir ebeveyni vardır (Parent) |
