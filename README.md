@@ -2,7 +2,7 @@
 
 ![Frontendimizi gösteren ekran fotoğrafı](./screenshot.png)
 
-Bu proje, bir HTML stringini parse ederek DOM ağacı yapısı oluşturur. Projemiz 3 bileşenden oluşmaktadır.
+Bu proje, bir HTML stringini parse ederek DOM ağacı yapısı oluşturur. Projemiz 3 kısımdan oluşmaktadır.
 
 ### 1. Core (Çekirdek) katmanı
 C#'taki hazır koleksiyonlar (`List<>`, `Dictionary<>` vb.) yerine kullandığımız kendi yazdığımız veri yapılarını, ağaç yapısını ve parser mantığını içerir.
