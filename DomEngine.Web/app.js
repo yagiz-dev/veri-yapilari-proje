@@ -71,18 +71,26 @@ templateBtns.forEach(btn => {
 
         if (template === 'custom') {
             const customTemplate = `<div id="root" class="container" data-version="1.0">
-    <header id="header-section">
+    <header id="header-section" class="nav-bar">
         <h1>Custom HTML</h1>
+        <nav>
+            <a href="#home" class="item active">Home</a>
+            <a href="#about" class="item">About</a>
+        </nav>
     </header>
-    <main>
-        <p>Buraya kendi HTML kodunuzu yazabilirsiniz.</p>
+    <main id="content">
+        <section class="card">
+            <p>Buraya kendi HTML kodunuzu yazabilirsiniz.</p>
+            <div id="deep-node" class="item">Arama örneği düğümü</div>
+        </section>
     </main>
+    <footer id="footer">Custom footer</footer>
 </div>`;
             editor.setValue(customTemplate, -1);
         } else {
             try {
                 setLoading(true);
-                const response = await fetch(`${template}.html`);
+                const response = await fetch(`ornek/${template}.html`);
                 if (!response.ok) {
                     throw new Error(`${template}.html dosyası bulunamadı. Lütfen dosyayı ekleyin.`);
                 }
