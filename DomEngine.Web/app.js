@@ -56,6 +56,49 @@ searchType.addEventListener('change', updateSearchGuide);
 
 updateSearchGuide();
 
+// Template Buttons Logic
+const templateBtns = document.querySelectorAll('.template-btn');
+
+templateBtns.forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+        // Remove active class from all
+        templateBtns.forEach(b => b.classList.remove('active'));
+        // Add active class to clicked
+        const clickedBtn = e.target.closest('.template-btn');
+        clickedBtn.classList.add('active');
+
+        const template = clickedBtn.dataset.template;
+
+        if (template === 'custom') {
+            const customTemplate = `<div id="root" class="container" data-version="1.0">
+    <header id="header-section">
+        <h1>Custom HTML</h1>
+    </header>
+    <main>
+        <p>Buraya kendi HTML kodunuzu yazabilirsiniz.</p>
+    </main>
+</div>`;
+            editor.setValue(customTemplate, -1);
+        } else {
+            try {
+                setLoading(true);
+                const response = await fetch(`${template}.html`);
+                if (!response.ok) {
+                    throw new Error(`${template}.html dosyası bulunamadı. Lütfen dosyayı ekleyin.`);
+                }
+                const htmlContent = await response.text();
+                editor.setValue(htmlContent, -1);
+                showStatus(`${template}.html başarıyla yüklendi`, 'success');
+            } catch (error) {
+                showStatus(error.message, 'error');
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        }
+    });
+});
+
 // Event Listeners
 parseBtn.addEventListener('click', async () => {
     try {
