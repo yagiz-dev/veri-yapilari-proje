@@ -1,6 +1,6 @@
 # HTML'den DOM Ağacı Oluşturma Projesi
 
-![Frontendimizi gösteren ekran fotoğrafı](./screenshot.png)
+![Frontendimizi gösteren ekran fotoğrafı](./projeekrangoruntusu.png)
 
 Bu proje, bir HTML stringini parse ederek DOM ağacı yapısı oluşturur. Projemiz 3 kısımdan oluşmaktadır.
 

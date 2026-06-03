@@ -4,7 +4,7 @@ FROM nginx:alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Statik web dosyalarını (HTML, CSS, JS) Nginx klasörüne kopyala
-COPY index.html /usr/share/nginx/html/
+COPY *.html /usr/share/nginx/html/
 COPY style.css /usr/share/nginx/html/
 COPY app.js /usr/share/nginx/html/
 

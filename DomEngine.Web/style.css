@@ -227,6 +227,37 @@ body {
     color: var(--text-secondary);
 }
 
+.template-buttons {
+    display: flex;
+    gap: 4px;
+    background: #eadfce;
+    padding: 4px;
+    border-radius: 8px;
+}
+
+.template-btn {
+    font-size: 0.8rem;
+    padding: 4px 12px;
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    border-radius: 6px;
+    box-shadow: none;
+}
+
+.template-btn:hover {
+    background: rgba(255, 255, 255, 0.4);
+    color: var(--text-primary);
+    transform: none; /* override .btn hover if needed */
+}
+
+.template-btn.active {
+    background: #fff;
+    color: var(--text-primary);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    font-weight: 600;
+}
+
 .status-badge {
     font-size: 0.75rem;
     padding: 4px 8px;
