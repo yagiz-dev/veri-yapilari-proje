@@ -252,7 +252,7 @@ Ağaç üzerinde katman katman (yatay olarak) yapılan arama işlemidir. Kuyruk 
 | DFS | O(N) | O(N) (N: ağaç derinliği) | `ArdaStack<T>` |
 | ID ile arama | O(1) | O(1) | `ArdaHashTable<K,V>` |
 
-## Yapay Zeka Raporu
+## Yapay Zeka Raporu
 
 Frontend'deki örnek HTML dosyalarını oluşturmak için GPT 5.5'i aşağıdaki promptla kullandık:
 
