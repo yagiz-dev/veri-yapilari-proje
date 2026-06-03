@@ -252,6 +252,21 @@ Ağaç üzerinde katman katman (yatay olarak) yapılan arama işlemidir. Kuyruk 
 | DFS | O(N) | O(N) (N: ağaç derinliği) | `ArdaStack<T>` |
 | ID ile arama | O(1) | O(1) | `ArdaHashTable<K,V>` |
 
+## Yapay Zeka Raporu
+
+Frontend'deki örnek HTML dosyalarını oluşturmak için GPT 5.5'i aşağıdaki promptla kullandık:
+
+```
+Parser'ımızı test etmek için 3 tane örnek HTML belgesi yazmamız gerekiyor.
+
+DomEngine.Web içine üç tane dosya oluşturalım:
+- 500'e yakın satırlık bir easy.html
+- 2000'e yakın satırlık bir medium.html
+- 8000'e yakın satırlık bir hard.html
+
+Bu metinlerin içinde bizim arama örneği olarak verdiğimiz örnekler de doğal bir şekilde olabilecek kadar yere yerleştirilsin. Örneğin dosyaların her birinde "header-section", "content", "footer" ID'li elemanlar olsun. Arama çubuğunun altındaki örneklerin işlevsel olması gerektiği için orada belirttiğimiz class'lar da metne doğal bir şekilde yedirilsin. Örneğin 'class="item"' şeklinde bir arama yaptığımızda metnin içinde olması gereken yerlerde bu class'a sahip elemanlar bulunsun.
+```
+
 ## Lisans
 Proje MIT lisansı altında lisanslanmıştır.
 
