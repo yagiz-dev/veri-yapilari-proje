@@ -275,7 +275,17 @@ DomEngine.Web içine üç tane dosya oluşturalım:
 Bu metinlerin içinde bizim arama örneği olarak verdiğimiz örnekler de doğal bir şekilde olabilecek kadar yere yerleştirilsin. Örneğin dosyaların her birinde "header-section", "content", "footer" ID'li elemanlar olsun. Arama çubuğunun altındaki örneklerin işlevsel olması gerektiği için orada belirttiğimiz class'lar da metne doğal bir şekilde yedirilsin. Örneğin 'class="item"' şeklinde bir arama yaptığımızda metnin içinde olması gereken yerlerde bu class'a sahip elemanlar bulunsun.
 ```
 
-Frontend'imizi oluşturmak için şu promptu kullandık:
+Projemiz boyunca kullandığımız bazı promtlar:
+
+- GetBucketIndex metodunun en sonunda _buckets.Lenght yerine _bucket.Capacity yazıp kapasite için bir constructer yapsam sadece get olan?
+- capacity değişkenini statik yaparsak her Capacity propertysi çalıştığında kapasite güncellenir mi?
+- when I open this project with .slnx file visual studio opens well but DomEngine.Web file isnt show up. Why?
+- I cant docker up my project şurda takılıyo hep:
+0.742   Determining projects to restore...
+#13 1.210   Restored /src/DomEngine.Core/DomEngine.Core.csproj (in 77 ms).
+- bana kısa bir html örneği yazar mısın dom parserimi deniyorum.
+- başka bir ui değişikliği de söyleyeyim açılır kapanır pencereler kapandığında altında o tagin kapama operatörü var mesela <div> kapattım ama altında hala </div> duruyor onu da divin içinde alalım daha güzel gözükür ama tabii ki o divin çocuğu değil onu biliyoruz sadece ui olarak içinde gözüksün yani kapanınca gözükmesin.
+  
 
 
 ## Lisans
