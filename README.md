@@ -262,22 +262,19 @@ Ağaç üzerinde katman katman (yatay olarak) yapılan arama işlemidir. Kuyruk 
 
 ## Yapay Zeka Raporu
 
-Frontend'deki örnek HTML dosyalarını oluşturmak için GPT 5.5'i aşağıdaki promptla kullandık:
-
+Yapay zekadan kullanabileceğimiz teknolojiler hakkında bilgi almak için aşağıdaki promptu kullandık:
 ```
-Parser'ımızı test etmek için 3 tane örnek HTML belgesi yazmamız gerekiyor.
-
-DomEngine.Web içine üç tane dosya oluşturalım:
-- 500'e yakın satırlık bir easy.html
-- 2000'e yakın satırlık bir medium.html
-- 8000'e yakın satırlık bir hard.html
-
-Bu metinlerin içinde bizim arama örneği olarak verdiğimiz örnekler de doğal bir şekilde olabilecek kadar yere yerleştirilsin. Örneğin dosyaların her birinde "header-section", "content", "footer" ID'li elemanlar olsun. Arama çubuğunun altındaki örneklerin işlevsel olması gerektiği için orada belirttiğimiz class'lar da metne doğal bir şekilde yedirilsin. Örneğin 'class="item"' şeklinde bir arama yaptığımızda metnin içinde olması gereken yerlerde bu class'a sahip elemanlar bulunsun.
+Şimdi bizim yapmamız gereken bir okul projemiz var bu projenin amacı bir html textini parse edip ağaç şeklinde açılır kapanır bir yapıyla sunmak.
+Bu proje için internette araştırma yaparken gördüğüm sitelerden ilham alıp onlara benzer bir site kurmaya karar verdik.
+Projemiz Veri Yapıları dersinin projesi olduğu için bizim için daha az önemli olan yapıları yani sitenin backend(api) ve frontend kısmını yapay zeka ile yapmaya karar verdik.
+Çalışmaya başlamadan önce çalışır bir proje görüp mantığını anlamak istiyorum. Sana bu proje için bir yol haritası oluşturuyorum. Adım adım kontrollü bir şekilde deneyerek bir proje oluşturalım.
+Daha sonra kendimiz yazacağımız yerleri iyice anlayarak yazarız.
 ```
 
-Projemiz boyunca kullandığımız bazı promtlar:
+Web ve API kısmının taslağının oluşturulması için aşağıdaki promptu kullandık:
 
--"veri yapıları dersi projemizin C# tarafındaki Core katmanını bitirdik. Kendi Node sınıfımızı (ErenDomNode), kendi dinamik dizimizi (ArdaList) ve Hash Table falan her şeyi sıfırdan yazdık. Parser ve BFS/DFS arama algoritmaları da sorunsuz çalışıyor.
+```
+veri yapıları dersi projemizin C# tarafındaki Core katmanını bitirdik. Kendi Node sınıfımızı (ErenDomNode), kendi dinamik dizimizi (ArdaList) ve Hash Table falan her şeyi sıfırdan yazdık. Parser ve BFS/DFS arama algoritmaları da sorunsuz çalışıyor.
 
 sunumda gösterebilmek için buna bir Web arayüzü ve API bağlamamız lazım ama frontend ile vakit kaybetmek istemiyoruz, bu kısımlarda bize sen yardım eder misin?
 
@@ -291,7 +288,11 @@ Solda kocaman bir kod yapıştırma alanı (textarea) olsun.
 Sağda arama tipi seçme (id, bfs, dfs) dropdown'u ve butonlar olsun.
 JavaScript'te fetch ile API'ye istek atıp gelen JSON sonucunu ekrana güzelce bas.
 İstek atarken butonlara "Loading..." efekti falan da koy güzel dursun. API kapalıysa kötü bir alert() verme, ekranda şık bir hata kutusu çıkar.
+```
 
+Sonrasında düzeltme yapmak için aşağıdaki promptları kullandık:
+
+```
 - GetBucketIndex metodunun en sonunda _buckets.Lenght yerine _bucket.Capacity yazıp kapasite için bir constructer yapsam sadece get olan?
 - capacity değişkenini statik yaparsak her Capacity propertysi çalıştığında kapasite güncellenir mi?
 - when I open this project with .slnx file visual studio opens well but DomEngine.Web file isnt show up. Why?
@@ -300,8 +301,20 @@ JavaScript'te fetch ile API'ye istek atıp gelen JSON sonucunu ekrana güzelce b
 #13 1.210   Restored /src/DomEngine.Core/DomEngine.Core.csproj (in 77 ms).
 - bana kısa bir html örneği yazar mısın dom parserimi deniyorum.
 - başka bir ui değişikliği de söyleyeyim açılır kapanır pencereler kapandığında altında o tagin kapama operatörü var mesela <div> kapattım ama altında hala </div> duruyor onu da divin içinde alalım daha güzel gözükür ama tabii ki o divin çocuğu değil onu biliyoruz sadece ui olarak içinde gözüksün yani kapanınca gözükmesin.
-  
+```
 
+Frontend'deki örnek HTML dosyalarını oluşturmak için GPT 5.5'i aşağıdaki promptla kullandık:
+
+```
+Parser'ımızı test etmek için 3 tane örnek HTML belgesi yazmamız gerekiyor.
+
+DomEngine.Web içine üç tane dosya oluşturalım:
+- 500'e yakın satırlık bir easy.html
+- 2000'e yakın satırlık bir medium.html
+- 8000'e yakın satırlık bir hard.html
+
+Bu metinlerin içinde bizim arama örneği olarak verdiğimiz örnekler de doğal bir şekilde olabilecek kadar yere yerleştirilsin. Örneğin dosyaların her birinde "header-section", "content", "footer" ID'li elemanlar olsun. Arama çubuğunun altındaki örneklerin işlevsel olması gerektiği için orada belirttiğimiz class'lar da metne doğal bir şekilde yedirilsin. Örneğin 'class="item"' şeklinde bir arama yaptığımızda metnin içinde olması gereken yerlerde bu class'a sahip elemanlar bulunsun.
+```
 
 ## Lisans
 Proje MIT lisansı altında lisanslanmıştır.
