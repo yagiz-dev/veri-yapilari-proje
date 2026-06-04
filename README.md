@@ -2,6 +2,14 @@
 
 ![Frontendimizi gösteren ekran fotoğrafı](./projeekrangoruntusu.png)
 
+---
+
+<div align="center">
+    <a href="https://drive.google.com/file/d/1wWZtfNdcsouVTxJyt3MQGJDn2ol1JsSO/view?usp=sharing"><img src="https://raw.githubusercontent.com/yagiz-dev/veri-yapilari-proje/main/video-butonu.png" alt="Video izleme butonu" width="200"/></a>
+</div>
+
+---
+
 Bu proje, bir HTML stringini parse ederek DOM ağacı yapısı oluşturur. Projemiz 3 kısımdan oluşmaktadır.
 
 ### 1. Core (Çekirdek) katmanı
@@ -266,6 +274,9 @@ DomEngine.Web içine üç tane dosya oluşturalım:
 
 Bu metinlerin içinde bizim arama örneği olarak verdiğimiz örnekler de doğal bir şekilde olabilecek kadar yere yerleştirilsin. Örneğin dosyaların her birinde "header-section", "content", "footer" ID'li elemanlar olsun. Arama çubuğunun altındaki örneklerin işlevsel olması gerektiği için orada belirttiğimiz class'lar da metne doğal bir şekilde yedirilsin. Örneğin 'class="item"' şeklinde bir arama yaptığımızda metnin içinde olması gereken yerlerde bu class'a sahip elemanlar bulunsun.
 ```
+
+Frontend'imizi oluşturmak için şu promptu kullandık:
+
 
 ## Lisans
 Proje MIT lisansı altında lisanslanmıştır.
