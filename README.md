@@ -316,6 +316,22 @@ DomEngine.Web içine üç tane dosya oluşturalım:
 Bu metinlerin içinde bizim arama örneği olarak verdiğimiz örnekler de doğal bir şekilde olabilecek kadar yere yerleştirilsin. Örneğin dosyaların her birinde "header-section", "content", "footer" ID'li elemanlar olsun. Arama çubuğunun altındaki örneklerin işlevsel olması gerektiği için orada belirttiğimiz class'lar da metne doğal bir şekilde yedirilsin. Örneğin 'class="item"' şeklinde bir arama yaptığımızda metnin içinde olması gereken yerlerde bu class'a sahip elemanlar bulunsun.
 ```
 
+UML diyagramımızı mermaid formatında oluşturmak için kullandığımız promt:
+
+```
+now we must create a uml diagram for this project with mermaid but diagram must  be academicly acceptable. You create a sample then Im gonna check it is true or false. 
+```
+
+Docker entegrasyonu için kullandığımız promt:
+
+```
+Projemizi diğer bilgisayarlarda ayağa kaldırmak için docker entegrasyonu yapmak istiyorum. Bana iki tane Dockerfile yazacaksın:
+
+API İçin: DomEngine.Api klasörüne konulacak. Resmi .NET 8 SDK imajını kullanarak kodu derlesin ve aspnet runtime imajı ile ayağa kaldırsın.
+Web İçin: DomEngine.Web klasörüne konulacak. Burada C# yok, sadece saf HTML/JS var. Bizim dosyaları Nginx'in içindeki html klasörüne kopyalayıp sunsun. Port çakışması olmasın, Nginx 80 portunda çalışsın.
+Kodları ve dosyaları temiz bir şekilde üret, direkt klasörlere atıp çalıştıralım."
+```
+
 ## Lisans
 Proje MIT lisansı altında lisanslanmıştır.
 
