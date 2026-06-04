@@ -5,12 +5,12 @@ using DomEngine.Core.Topology;
 namespace DomEngine.Core.Parser;
 
 /// <summary>
-/// Gelen HTML metnini tarayıp (tokenization) parçalara ayıran ve
+/// Gelen HTML metnini tarayıp parçalara ayıran ve
 /// ArdaStack kullanarak ErenNaryTree (DOM Ağacı) oluşturan motor.
 /// </summary>
 public class YagizhanHtmlParser
 {
-    // Kendi kendine kapanan (self-closing) etiketler. Bunlar stack'e atılmaz.
+    // Kendi kendine kapanan etiketler. Bunları stack'e atmıyoruz.
     private readonly string[] _selfClosingTags = { "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr" };
 
     public ErenNaryTree Parse(string html)
@@ -31,7 +31,7 @@ public class YagizhanHtmlParser
         {
             if (html[i] == '<')
             {
-                // 1. Önceki birikmiş metni (Inner Text) mevcut düğüme kaydet
+                // 1. Önceki birikmiş metni (Inner Text) mevcut node'a kaydet
                 if (textBuffer.Length > 0 && stack.Count > 0)
                 {
                     string text = textBuffer.ToString();
@@ -158,7 +158,7 @@ public class YagizhanHtmlParser
                     stack.Peek().AddChild(newNode);
                 }
 
-                // Kendi kendini kapatan tag değilse (örn: <div>) stack'e ekle (Çocukları olabilir)
+                // Kendi kendini kapatan tag değilse stack'e ekle (Çocukları olabilir)
                 bool isSelfClosing = isSelfClosingImplicit || IsSelfClosingTag(newNode.TagName);
                 if (!isSelfClosing)
                 {
@@ -168,9 +168,7 @@ public class YagizhanHtmlParser
 
                 i = tagEnd + 1;
                 continue;
-            }
-            else
-            {
+            } else {
                 // Normal metin (Inner Text) karakterleri
                 textBuffer.Append(html[i]);
                 i++;
