@@ -277,6 +277,21 @@ Bu metinlerin içinde bizim arama örneği olarak verdiğimiz örnekler de doğa
 
 Projemiz boyunca kullandığımız bazı promtlar:
 
+-"veri yapıları dersi projemizin C# tarafındaki Core katmanını bitirdik. Kendi Node sınıfımızı (ErenDomNode), kendi dinamik dizimizi (ArdaList) ve Hash Table falan her şeyi sıfırdan yazdık. Parser ve BFS/DFS arama algoritmaları da sorunsuz çalışıyor.
+
+sunumda gösterebilmek için buna bir Web arayüzü ve API bağlamamız lazım ama frontend ile vakit kaybetmek istemiyoruz, bu kısımlarda bize sen yardım eder misin?
+
+İstediğimiz şeyler şunlar:
+
+1. API Tarafı: Bir tane .NET Core Web API projesi aç ve bizim yazdığımız parser'ı buraya bağla. İki tane endpoint olsun: Biri gönderdiğimiz HTML'i parse edip ağacı dönsün, diğeri de arama yapsın (id, bfs veya dfs ile). Önemli Not: Bizim veri yapıları custom (özel) olduğu için tarayıcı bunları doğrudan JSON'a çevirmeye çalışınca patlıyor. O yüzden API'de verileri Frontend'e fırlatmadan önce bizim ArdaList ve ArdaHashTable nesnelerini standart C# sınıflarına (List, Dictionary) çeviren bir DTO (MapToDto) fonksiyonu yaz ki patlamasın. Arama süresini de Stopwatch ile tutup JSON'a ekle.
+
+2. Web Tarafı: Bir de tek sayfalık HTML/CSS/JS yaz. React falan karıştırma, kurmasıyla uğraşmayalım dümdüz Vanilla olsun ama tasarımı modern (krem tema) dursun.
+
+Solda kocaman bir kod yapıştırma alanı (textarea) olsun.
+Sağda arama tipi seçme (id, bfs, dfs) dropdown'u ve butonlar olsun.
+JavaScript'te fetch ile API'ye istek atıp gelen JSON sonucunu ekrana güzelce bas.
+İstek atarken butonlara "Loading..." efekti falan da koy güzel dursun. API kapalıysa kötü bir alert() verme, ekranda şık bir hata kutusu çıkar.
+
 - GetBucketIndex metodunun en sonunda _buckets.Lenght yerine _bucket.Capacity yazıp kapasite için bir constructer yapsam sadece get olan?
 - capacity değişkenini statik yaparsak her Capacity propertysi çalıştığında kapasite güncellenir mi?
 - when I open this project with .slnx file visual studio opens well but DomEngine.Web file isnt show up. Why?
