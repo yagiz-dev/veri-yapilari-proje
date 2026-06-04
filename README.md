@@ -281,11 +281,11 @@ Projemiz boyunca kullandığımız bazı promtlar:
 
 sunumda gösterebilmek için buna bir Web arayüzü ve API bağlamamız lazım ama frontend ile vakit kaybetmek istemiyoruz, bu kısımlarda bize sen yardım eder misin?
 
-İstediğimiz şeyler şunlar:
+İstediğimiz şeyler:
 
-1. API Tarafı: Bir tane .NET Core Web API projesi aç ve bizim yazdığımız parser'ı buraya bağla. İki tane endpoint olsun: Biri gönderdiğimiz HTML'i parse edip ağacı dönsün, diğeri de arama yapsın (id, bfs veya dfs ile). Önemli Not: Bizim veri yapıları custom (özel) olduğu için tarayıcı bunları doğrudan JSON'a çevirmeye çalışınca patlıyor. O yüzden API'de verileri Frontend'e fırlatmadan önce bizim ArdaList ve ArdaHashTable nesnelerini standart C# sınıflarına (List, Dictionary) çeviren bir DTO (MapToDto) fonksiyonu yaz ki patlamasın. Arama süresini de Stopwatch ile tutup JSON'a ekle.
+API Tarafı: Bir tane .NET Core Web API projesi aç ve bizim yazdığımız parser'ı buraya bağla. İki tane endpoint olsun: Biri gönderdiğimiz HTML'i parse edip ağacı dönsün, diğeri de arama yapsın (id, bfs veya dfs ile). Önemli Not: Bizim veri yapıları custom (özel) olduğu için tarayıcı bunları doğrudan JSON'a çevirmeye çalışınca patlıyor. O yüzden API'de verileri Frontend'e fırlatmadan önce bizim ArdaList ve ArdaHashTable nesnelerini standart C# sınıflarına (List, Dictionary) çeviren bir DTO (MapToDto) fonksiyonu yaz ki patlamasın. Arama süresini de Stopwatch ile tutup JSON'a ekle.
 
-2. Web Tarafı: Bir de tek sayfalık HTML/CSS/JS yaz. React falan karıştırma, kurmasıyla uğraşmayalım dümdüz Vanilla olsun ama tasarımı modern (krem tema) dursun.
+Web Tarafı: Bir de tek sayfalık HTML/CSS/JS yaz. React falan karıştırma, kurmasıyla uğraşmayalım dümdüz Vanilla olsun ama tasarımı modern (krem tema) dursun.
 
 Solda kocaman bir kod yapıştırma alanı (textarea) olsun.
 Sağda arama tipi seçme (id, bfs, dfs) dropdown'u ve butonlar olsun.
