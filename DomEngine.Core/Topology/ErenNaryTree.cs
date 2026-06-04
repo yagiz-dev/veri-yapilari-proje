@@ -55,6 +55,10 @@ public class ErenNaryTree
         {
             throw new System.ArgumentNullException(nameof(parent));
         }
+        if (child == null)
+        {
+            throw new System.ArgumentNullException(nameof(child));
+        }
 
         parent.AddChild(child);
     }

@@ -9,7 +9,7 @@ public class ErenDomNode
 {
     public string TagName { get; set; }
     public string InnerText { get; set; }
-    public ErenDomNode? Parent { get; set; }
+    public ErenDomNode? Parent { get; private set; }
     
     // Kendi yazdığımız liste sınıfı kullanılıyor
     public ArdaList<ErenDomNode> Children { get; private set; }
