@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DOM Ağacı Oluşturma</title>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <!-- Ace Editor for Syntax Highlighting -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.3/ace.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div class="app-container">
         <!-- Header & Search -->
@@ -36,7 +40,7 @@
                     <div class="search-examples" id="searchExamples" aria-label="Örnek aramalar"></div>
                 </div>
             </div>
-            
+
             <div class="actions">
                 <button id="parseBtn" class="btn parse-btn">Ağacı Oluştur</button>
             </div>
@@ -57,27 +61,26 @@
                 </div>
                 <div class="editor-wrapper">
                     <div id="htmlEditor">&lt;div id="root" class="container main-wrapper" data-version="1.0"&gt;
-    &lt;header id="header-section" class="nav-bar"&gt;
-        &lt;h1 class="title"&gt;Dom Engine Stress Test&lt;/h1&gt;
-        &lt;nav&gt;
-            &lt;ul id="nav-list" class="list-style-none"&gt;
-                &lt;li class="item active"&gt;&lt;a href="#home"&gt;Home&lt;/a&gt;&lt;/li&gt;
-                &lt;li class="item"&gt;&lt;a href="#about"&gt;About&lt;/a&gt;&lt;/li&gt;
-                &lt;li class="item"&gt;&lt;a href="#contact"&gt;Contact&lt;/a&gt;&lt;/li&gt;
-            &lt;/ul&gt;
-        &lt;/nav&gt;
-    &lt;/header&gt;
-    &lt;main id="content" class="flex-row"&gt;
-        &lt;section class="card-wrapper"&gt;
-            &lt;div id="card-1" class="card shadow-lg"&gt;
-                &lt;h2 class="card-title"&gt;Nesting Test&lt;/h2&gt;
-                &lt;div class="inner-content"&gt;
-                    &lt;p class="text-bold"&gt;Deeply nested structure starts here:&lt;/p&gt;
-                    &lt;div class="level-1"&gt;
+                        &lt;header id="header-section" class="nav-bar"&gt;
+                        &lt;h1 class="title"&gt;Dom Engine Stress Test&lt;/h1&gt;
+                        &lt;nav&gt;
+                        &lt;ul id="nav-list" class="list-style-none"&gt;
+                        &lt;li class="item active"&gt;&lt;a href="#home"&gt;Home&lt;/a&gt;&lt;/li&gt;
+                        &lt;li class="item"&gt;&lt;a href="#about"&gt;About&lt;/a&gt;&lt;/li&gt;
+                        &lt;li class="item"&gt;&lt;a href="#contact"&gt;Contact&lt;/a&gt;&lt;/li&gt;
+                        &lt;/ul&gt;
+                        &lt;/nav&gt;
+                        &lt;/header&gt;
+                        &lt;main id="content" class="flex-row"&gt;
+                        &lt;section class="card-wrapper"&gt;
+                        &lt;div id="card-1" class="card shadow-lg"&gt;
+                        &lt;h2 class="card-title"&gt;Nesting Test&lt;/h2&gt;
+                        &lt;div class="inner-content"&gt;
+                        &lt;p class="text-bold"&gt;Deeply nested structure starts here:&lt;/p&gt;
+                        &lt;div class="level-1"&gt;
                         &lt;div class="level-2"&gt;
-                            &lt;div class="level-3" id="deep-node"&gt;
-                                &lt;span class="badge secondary"&gt;Level 3 Reached!&lt;/span&gt;
-                            &lt;/div&gt;
+                        &lt;div class="level-3" id="deep-node"&gt;
+                        &lt;span class="badge secondary"&gt;Level 3 Reached!&lt;/span&gt;
                         &lt;/div&gt;
                     &lt;/div&gt;
                 &lt;/div&gt;
@@ -118,4 +121,5 @@
 
     <script src="app.js"></script>
 </body>
+
 </html>
